@@ -1,0 +1,789 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WGSmart — every WireGuard tunnel up at once, on macOS</title>
+<meta name="description" content="WGSmart runs multiple WireGuard tunnels at the same time on macOS and routes each destination down the tunnel you choose. Free, closed-source, bring your own configs.">
+<link rel="canonical" href="https://wgsmart.base101.app/">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#FBFCFD">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="WGSmart">
+<meta property="og:title" content="WGSmart — every WireGuard tunnel up at once">
+<meta property="og:description" content="The official WireGuard client runs one tunnel at a time. WGSmart runs all of them, and sends each destination down the tunnel you pick.">
+<meta property="og:url" content="https://wgsmart.base101.app/">
+<meta property="og:image" content="https://wgsmart.base101.app/assets/ui/dashboard.svg">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+<link rel="alternate" hreflang="en" href="https://wgsmart.base101.app/?lang=en">
+<link rel="alternate" hreflang="vi" href="https://wgsmart.base101.app/?lang=vi">
+<link rel="alternate" hreflang="zh-Hans" href="https://wgsmart.base101.app/?lang=zh">
+<link rel="alternate" hreflang="x-default" href="https://wgsmart.base101.app/">
+<style>
+  /* ─────────────────────────────────────────────────────────────────────────
+     WGSmart landing — light, cool-neutral.
+
+     THE THESIS: light page, dark product. WGSmart carries two trust deficits it
+     cannot hide — closed source, and not yet notarized. A dark "hacker console"
+     page amplifies exactly the suspicion it needs to defuse in someone being
+     asked to install a root daemon from an unknown developer. Light reads as
+     open and accountable; it is what Tailscale, Mullvad, 1Password and Stripe
+     all use, and they are all selling trust.
+
+     The brand is not lost — it moves. Obsidian stops being the GROUND and
+     becomes the INK; Electric Blue stays the single accent; and the app's dark
+     UI becomes the focal point by contrast, the way Linear and Raycast present
+     dark apps on light pages.
+
+     Deliberately NOT the warm-cream + serif + terracotta palette that generated
+     landing pages cluster around. The neutrals here are biased cool, toward the
+     accent, so they read as chosen rather than inherited.
+     ───────────────────────────────────────────────────────────────────────── */
+  :root{
+    --ground:#FBFCFD;        /* near-white, biased cool */
+    --surface:#FFFFFF;       /* cards lift OFF the ground by being pure white */
+    --surface-2:#F1F5F9;     /* alternating section bands */
+    --line:#E3EAF1;
+    --line-strong:#CBD8E4;
+
+    --ink:#0B1B2B;           /* Obsidian, now the type colour */
+    --ink-2:#3D566F;
+    --ink-3:#5D7794;
+    --ink-4:#566E88;
+
+    --accent:#2563EB;        /* Electric Blue, deepened for contrast on white */
+    --accent-ink:#1D4ED8;    /* small text / links need the darker step */
+    --accent-soft:#EAF2FE;   /* tinted fills */
+
+    /* Semantic, kept separate from the accent so state never competes with brand. */
+    --ok:#067A55;
+    --ok-soft:#E6F6F0;
+    --warn:#B45309;
+    --warn-soft:#FDF3E7;
+    --stop:#C81E1E;
+    --stop-soft:#FDECEC;
+
+    /* The product's own surfaces stay dark — they are the contrast anchor. */
+    --dark-well:#0A1521;
+    --dark-surface:#16293D;
+    --dark-line:#22405C;
+    --dark-ink:#EAF2FA;
+    --dark-ink-3:#8DA2B8;
+
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;
+    --col:1080px;
+    --shadow-sm:0 1px 2px rgba(11,27,43,.06), 0 1px 3px rgba(11,27,43,.04);
+    --shadow-md:0 2px 4px rgba(11,27,43,.05), 0 8px 24px rgba(11,27,43,.07);
+    --shadow-lg:0 8px 20px rgba(11,27,43,.08), 0 24px 60px rgba(11,27,43,.12);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  body{
+    margin:0;background:var(--ground);color:var(--ink);
+    font-family:var(--sans);font-size:17px;line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:var(--col);margin:0 auto;padding:0 24px}
+  section{padding:84px 0;border-top:1px solid var(--line)}
+  section:first-of-type{border-top:0}
+  /* alternating bands give rhythm without extra chrome */
+  #how,#download{background:var(--surface-2);border-top-color:var(--line)}
+
+  h1,h2,h3{text-wrap:balance;margin:0;letter-spacing:-.022em;line-height:1.12}
+  h1{font-size:clamp(2.5rem,5.8vw,4.1rem);font-weight:700}
+  h2{font-size:clamp(1.6rem,3vw,2.2rem);font-weight:650}
+  h3{font-size:1.05rem;font-weight:650;letter-spacing:-.01em}
+  p{margin:0}
+  a{color:var(--accent-ink);text-decoration:none}
+  a:hover{text-decoration:underline}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:5px}
+
+  .eyebrow{font-family:var(--mono);font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-4);margin-bottom:14px}
+  .lede{color:var(--ink-2);font-size:1.14rem;max-width:62ch}
+  .muted{color:var(--ink-3);font-size:.95rem}
+  .tiny{color:var(--ink-4);font-size:.82rem;line-height:1.6}
+  .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+  /* ---------- nav ---------- */
+  .bar{position:sticky;top:0;z-index:40;background:rgba(251,252,253,.82);backdrop-filter:saturate(160%) blur(12px);border-bottom:1px solid var(--line)}
+  .bar-in{max-width:var(--col);margin:0 auto;padding:11px 24px;display:flex;align-items:center;gap:16px}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:650;letter-spacing:-.015em;color:var(--ink)}
+  .brand svg{width:24px;height:24px;flex:none}
+  .navlinks{display:none;gap:22px;margin-left:28px}
+  @media(min-width:820px){.navlinks{display:flex}}
+  .navlinks a{color:var(--ink-3);font-size:.89rem;font-weight:500}
+  .navlinks a:hover{color:var(--ink);text-decoration:none}
+  .langs{margin-left:auto;display:flex;gap:2px;background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:3px}
+  .langs button{font:inherit;font-size:.78rem;font-weight:600;color:var(--ink-3);background:none;border:0;padding:5px 11px;border-radius:6px;cursor:pointer}
+  .langs button[aria-pressed="true"]{background:var(--accent);color:#fff}
+  .langs button:hover:not([aria-pressed="true"]){color:var(--ink)}
+
+  /* ---------- hero ---------- */
+  .hero{padding:72px 0 64px}
+  .badges{display:flex;flex-wrap:wrap;gap:7px;margin:24px 0 0}
+  .badge{font-family:var(--mono);font-size:.72rem;letter-spacing:.02em;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink-3);padding:4px 10px;border-radius:6px}
+  .badge.hot{border-color:#EBC08A;background:var(--warn-soft);color:var(--warn)}
+  .cta{display:flex;flex-wrap:wrap;gap:11px;margin-top:30px;align-items:center}
+  .btn{font:inherit;font-weight:600;font-size:.96rem;padding:12px 20px;border-radius:10px;border:1px solid transparent;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+  .btn-primary{background:var(--accent);color:#fff;border-color:var(--accent-ink);box-shadow:var(--shadow-sm)}
+  .btn-primary:hover{background:var(--accent-ink);text-decoration:none}
+  .btn-ghost{background:var(--surface);color:var(--ink);border-color:var(--line-strong);box-shadow:var(--shadow-sm)}
+  .btn-ghost:hover{border-color:var(--accent);color:var(--accent-ink);text-decoration:none}
+
+  .trust{display:flex;flex-wrap:wrap;gap:8px 28px;margin-top:32px;padding-top:24px;border-top:1px solid var(--line)}
+  .trust div{display:flex;align-items:center;gap:8px;font-size:.87rem;color:var(--ink-2)}
+  .trust svg{width:15px;height:15px;flex:none;color:var(--ok)}
+
+  /* ---------- the rack: DARK on purpose, it is the product ---------- */
+  .rack{margin-top:46px;background:var(--dark-well);border:1px solid var(--dark-line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-lg)}
+  .rack-head{display:flex;align-items:center;gap:10px;padding:12px 17px;border-bottom:1px solid var(--dark-line);background:var(--dark-surface);color:var(--dark-ink)}
+  .dot{width:9px;height:9px;border-radius:50%;background:#34D399;flex:none}
+  .rack-head strong{color:var(--dark-ink)}
+  .rack-head .mono{font-size:.76rem;color:var(--dark-ink-3);margin-left:auto}
+  .lane{display:grid;grid-template-columns:1fr auto;gap:4px 16px;align-items:center;padding:16px 17px;border-bottom:1px solid var(--dark-line);color:var(--dark-ink)}
+  .lane:last-child{border-bottom:0}
+  .lane-name{display:flex;align-items:center;gap:9px;font-weight:600;font-size:.97rem;color:var(--dark-ink)}
+  .pip{width:7px;height:7px;border-radius:50%;flex:none;background:#34D399}
+  .pip.idle{background:var(--dark-ink-3)}
+  .lane-route{font-family:var(--mono);font-size:.79rem;color:var(--dark-ink-3);grid-column:1}
+  .lane-route b{color:#60A5FA;font-weight:600}
+  .lane-rate{font-family:var(--mono);font-size:.78rem;color:var(--dark-ink-3);text-align:right;font-variant-numeric:tabular-nums}
+  .lane-rate span{color:#5E7590}
+  .flow{grid-column:1/-1;height:3px;border-radius:2px;background:#1B3149;overflow:hidden;margin-top:10px}
+  .flow i{display:block;height:100%;width:32%;border-radius:2px;background:linear-gradient(90deg,transparent,#3B82F6,transparent);animation:slide 2.4s linear infinite}
+  .lane:nth-child(3) .flow i{animation-duration:3.6s;animation-delay:-.7s}
+  .lane:nth-child(4) .flow i{animation-duration:5.2s;animation-delay:-1.9s;background:linear-gradient(90deg,transparent,#5E7590,transparent)}
+  @keyframes slide{from{transform:translateX(-110%)}to{transform:translateX(340%)}}
+  @media (prefers-reduced-motion:reduce){.flow i{animation:none;width:46%}}
+
+  /* ---------- status chips: the ledger's vocabulary, made visible ---------- */
+  .chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;padding:4px 10px;border-radius:999px;border:1px solid;white-space:nowrap;font-weight:500}
+  .chip::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor;flex:none}
+  .chip.now{color:var(--ok);border-color:#A7DFC9;background:var(--ok-soft)}
+  .chip.test{color:var(--warn);border-color:#EBC08A;background:var(--warn-soft)}
+  .chip.plan{color:var(--ink-3);border-color:var(--line-strong);background:var(--surface)}
+  .chip.no{color:var(--stop);border-color:#F3B4B4;background:var(--stop-soft)}
+
+  .sec-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:10px}
+
+  .grid{display:grid;gap:13px;margin-top:28px}
+  @media(min-width:720px){.grid.two{grid-template-columns:1fr 1fr}}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:19px 20px;display:flex;flex-direction:column;gap:7px;box-shadow:var(--shadow-sm)}
+  .card.flag{border-color:#EBC08A;background:var(--warn-soft)}
+  .card p{color:var(--ink-2);font-size:.92rem}
+  .card code{font-family:var(--mono);font-size:.85em;color:var(--accent-ink);background:var(--accent-soft);padding:1px 5px;border-radius:4px}
+
+  /* ---------- how it works ---------- */
+  .steps{display:grid;gap:14px;margin-top:30px}
+  @media(min-width:760px){.steps{grid-template-columns:repeat(3,1fr)}}
+  .step{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:21px;display:flex;flex-direction:column;gap:9px;box-shadow:var(--shadow-sm)}
+  .step .n{font-family:var(--mono);font-size:.78rem;color:var(--accent);letter-spacing:.1em;font-weight:600}
+  .step h3{font-size:1.02rem}
+  .step p{color:var(--ink-2);font-size:.91rem}
+
+  /* ---------- features: BENTO, not a uniform grid ----------
+     Eleven equal tiles is a wall. Letting the three load-bearing claims span two
+     columns gives the eye somewhere to land first and encodes what matters. */
+  .fgrid{display:grid;gap:13px;margin-top:28px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+  .f{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:19px 20px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow-sm);transition:box-shadow .18s ease,transform .18s ease}
+  .f:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+  @media (prefers-reduced-motion:reduce){.f{transition:none}.f:hover{transform:none}}
+  .f .ic{width:26px;height:26px;color:var(--accent)}
+  .f h3{font-size:.99rem}
+  .f p{color:var(--ink-2);font-size:.89rem;line-height:1.55}
+  .f code{font-family:var(--mono);font-size:.85em;color:var(--accent-ink)}
+  @media(min-width:900px){
+    .fgrid{grid-template-columns:repeat(3,1fr)}
+    .f:nth-child(1),.f:nth-child(5),.f:nth-child(11){grid-column:span 2}
+    .f:nth-child(1) h3{font-size:1.12rem}
+  }
+
+  /* ---------- product visuals ---------- */
+  .shots{display:grid;gap:16px;margin-top:30px}
+  @media(min-width:760px){.shots{grid-template-columns:1fr 1fr}}
+  figure{margin:0;display:flex;flex-direction:column;gap:11px}
+  figure img{width:100%;height:auto;border-radius:12px;display:block;box-shadow:var(--shadow-lg);border:1px solid var(--line)}
+  figcaption{color:var(--ink-3);font-size:.86rem;padding:0 2px}
+  .shot-wide{grid-column:1/-1}
+
+  pre{margin:0;background:var(--dark-well);border:1px solid var(--dark-line);border-radius:12px;padding:16px 18px;overflow-x:auto;font-family:var(--mono);font-size:.83rem;line-height:1.75;color:var(--dark-ink);box-shadow:var(--shadow-md)}
+  pre b{color:#34D399;font-weight:600}
+  pre .c{color:var(--dark-ink-3)}
+
+  .note{border-left:3px solid var(--warn);background:var(--warn-soft);border-radius:0 12px 12px 0;padding:18px 20px;display:flex;flex-direction:column;gap:9px;margin-top:26px}
+  .note h3{color:var(--warn)}
+  .note p{color:var(--ink-2);font-size:.93rem}
+
+  .pays{display:grid;gap:14px;margin-top:28px}
+  @media(min-width:700px){.pays{grid-template-columns:repeat(3,1fr)}}
+  .pay{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:19px;display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center;box-shadow:var(--shadow-sm)}
+  .pay img{width:100%;max-width:158px;aspect-ratio:1;object-fit:contain;background:#fff;border-radius:10px;padding:6px;border:1px solid var(--line)}
+  .pay h3{font-size:.97rem}
+  .pay .who{font-family:var(--mono);font-size:.78rem;color:var(--ink-2);word-break:break-all}
+  .copy{font:inherit;font-size:.8rem;font-weight:600;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--line-strong);border-radius:8px;padding:6px 13px;cursor:pointer}
+  .copy:hover{border-color:var(--accent);color:var(--accent-ink)}
+
+  .goal{margin-top:28px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow-sm)}
+  .meter{height:8px;border-radius:5px;background:var(--surface-2);overflow:hidden;border:1px solid var(--line)}
+  .meter i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#60A5FA)}
+
+  table{width:100%;border-collapse:collapse;margin-top:26px;font-size:.9rem;background:var(--surface);border-radius:12px;overflow:hidden;box-shadow:var(--shadow-sm)}
+  .tscroll{overflow-x:auto;border-radius:12px}
+  th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  tr:last-child td{border-bottom:0}
+  th{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-4);font-weight:500;background:var(--surface-2)}
+  td{color:var(--ink-2)}
+  td:first-child{font-weight:600;white-space:nowrap;color:var(--ink)}
+
+  footer{border-top:1px solid var(--line);padding:36px 0 48px;color:var(--ink-3);font-size:.86rem;background:var(--surface-2)}
+  footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center}
+  footer a{color:var(--ink-2)}
+
+  [data-lang]{display:none}
+  [data-lang].on{display:block}
+</style>
+</head>
+<body>
+<div class="bar">
+  <div class="bar-in">
+    <span class="brand">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#60A5FA"/><stop offset="1" stop-color="#2563EB"/></linearGradient></defs><path d="M16 2.5 27 6.4v9.3c0 6.6-4.4 12-11 14.3-6.6-2.3-11-7.7-11-14.3V6.4z" fill="url(#lg)"/><path d="M10.6 16.2l3.6 3.6 7-7" fill="none" stroke="#0A1521" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      WGSmart
+    </span>
+    <nav class="navlinks" aria-label="Sections">
+      <a href="#works" data-t="nav1">Features</a>
+      <a href="#shots" data-t="nav2">Screenshots</a>
+      <a href="#download" data-t="nav3">Download</a>
+      <a href="#support" data-t="nav4">Support</a>
+    </nav>
+    <div class="langs" role="group" aria-label="Language">
+      <button data-set="en" aria-pressed="true">EN</button>
+      <button data-set="vi" aria-pressed="false">VI</button>
+      <button data-set="zh" aria-pressed="false">中文</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div data-lang="en" class="on">
+      <p class="eyebrow">WireGuard · macOS</p>
+      <h1>Every tunnel up at once.</h1>
+      <p class="lede">The official WireGuard client runs one tunnel at a time. WGSmart runs all of them — and sends each destination down the tunnel you pick.</p>
+    </div>
+    <div data-lang="vi">
+      <p class="eyebrow">WireGuard · macOS</p>
+      <h1>Bật mọi tunnel cùng lúc.</h1>
+      <p class="lede">App WireGuard chính thức chỉ chạy được một tunnel tại một thời điểm. WGSmart chạy tất cả — và đẩy từng đích đến qua đúng tunnel bạn chọn.</p>
+    </div>
+    <div data-lang="zh">
+      <p class="eyebrow">WireGuard · macOS</p>
+      <h1>所有隧道同时在线。</h1>
+      <p class="lede">官方 WireGuard 客户端一次只能运行一条隧道。WGSmart 让它们全部运行——并把每个目标地址送进你指定的那一条。</p>
+    </div>
+
+    <div class="badges">
+      <span class="badge mono" id="ver-badge">v1.0.0</span>
+      <span class="badge hot mono" data-t="badge-pre">pre-release</span>
+      <span class="badge mono" data-t="badge-os">macOS 15+ · Apple Silicon &amp; Intel</span>
+      <span class="badge mono" data-t="badge-lic">Freeware · closed source</span>
+    </div>
+
+    <div class="cta">
+      <a class="btn btn-primary" href="#download"><span data-t="cta-dl">Download for macOS</span></a>
+      <a class="btn btn-ghost" href="#works"><span data-t="cta-works">What actually works today</span></a>
+    </div>
+
+    <div class="trust">
+      <div><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10 1.5 17 4v6.2c0 4.4-2.9 8-7 9.3-4.1-1.3-7-4.9-7-9.3V4z"/></svg><span data-t="t1">Your keys stay in the macOS Keychain</span></div>
+      <div><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10 1.5 17 4v6.2c0 4.4-2.9 8-7 9.3-4.1-1.3-7-4.9-7-9.3V4z"/></svg><span data-t="t2">No account, no telemetry</span></div>
+      <div><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10 1.5 17 4v6.2c0 4.4-2.9 8-7 9.3-4.1-1.3-7-4.9-7-9.3V4z"/></svg><span data-t="t3">Your own servers, your own configs</span></div>
+    </div>
+
+    <!-- the thesis, made literal -->
+    <div class="rack" role="img" aria-label="Three WireGuard tunnels connected simultaneously, each routing a different destination">
+      <div class="rack-head">
+        <span class="dot"></span>
+        <strong style="font-size:.9rem" data-t="rack-title">3 tunnels active</strong>
+        <span class="mono" data-t="rack-ks">Kill switch armed</span>
+      </div>
+      <div class="lane">
+        <div class="lane-name"><span class="pip"></span>Tokyo · JP</div>
+        <div class="lane-rate">1.4 <span>MB/s</span></div>
+        <div class="lane-route" data-t="lane1"><b>0.0.0.0/0</b> — everything else</div>
+        <div class="flow"><i></i></div>
+      </div>
+      <div class="lane">
+        <div class="lane-name"><span class="pip"></span>Office · SG</div>
+        <div class="lane-rate">86 <span>KB/s</span></div>
+        <div class="lane-route" data-t="lane2"><b>10.20.0.0/16</b> — internal services</div>
+        <div class="flow"><i></i></div>
+      </div>
+      <div class="lane">
+        <div class="lane-name"><span class="pip"></span>Lab · VN</div>
+        <div class="lane-rate">2 <span>KB/s</span></div>
+        <div class="lane-route" data-t="lane3"><b>203.0.113.7/32</b> — one host, wins over the full tunnel</div>
+        <div class="flow"><i></i></div>
+      </div>
+    </div>
+    <p class="tiny" style="margin-top:12px" data-t="rack-note">Longest prefix wins: a <span class="mono">/32</span> route beats a full tunnel, so one host can leave through a different exit than everything else.</p>
+  </section>
+
+
+  <!-- ============ HOW IT WORKS ============ -->
+  <section id="how">
+    <div class="sec-head"><h2 data-t="how-h">⚡ How it works</h2></div>
+    <p class="muted" data-t="how-sub">Three steps. You already have the configs.</p>
+    <div class="steps">
+      <div class="step">
+        <span class="n">01</span>
+        <h3 data-t="s1t">Import your configs</h3>
+        <p data-t="s1d">Drop in a <span class="mono">.conf</span>, scan a QR, or type it by hand. Overlapping ranges and a second full-tunnel get flagged right there.</p>
+      </div>
+      <div class="step">
+        <span class="n">02</span>
+        <h3 data-t="s2t">Say what goes where</h3>
+        <p data-t="s2d">Pin an address or a range to a specific tunnel. Longest prefix wins, so one host can leave through a different exit than everything else.</p>
+      </div>
+      <div class="step">
+        <span class="n">03</span>
+        <h3 data-t="s3t">Connect them all at once</h3>
+        <p data-t="s3d">Every tunnel up in parallel, with a kill switch that fails closed and a test that proves traffic really leaves where you said.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WHY ============ -->
+  <section>
+    <p class="eyebrow" data-t="why-eye">Why it exists</p>
+    <h2 data-t="why-h">It started with two VPNs that both had to be on.</h2>
+    <p class="lede" style="margin-top:14px" data-t="why-p">Two servers, two configs, both needed at the same time — and a client that could only hold one. The workaround was editing <span class="mono">AllowedIPs</span> by hand and restarting tunnels all day. WGSmart is what replaced that.</p>
+    <p class="muted" style="margin-top:18px" data-t="why-p2">It is not a VPN service. There are no servers to subscribe to and nothing to sign up for — you bring your own WireGuard configs, and WGSmart is the thing that makes them behave.</p>
+  </section>
+
+  <!-- ============ WORKS NOW ============ -->
+  <section id="works">
+    <div class="sec-head">
+      <h2 data-t="now-h">✨ Working now</h2>
+      <span class="chip now" data-t="chip-now">in daily use</span>
+    </div>
+    <p class="muted" data-t="now-sub">Used every day on macOS by the person who wrote it.</p>
+    <div class="fgrid">
+      <div class="f">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        <h3 data-t="f1t">Many tunnels, all at once</h3>
+        <p data-t="f1d">Each with its own AllowedIPs, connected in parallel rather than one-at-a-time.</p>
+      </div>
+      <div class="f">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h6l3-7 3 14 3-7h3"/></svg>
+        <h3 data-t="f2t">Route any address to any tunnel</h3>
+        <p data-t="f2d">Pin an IP or CIDR to a specific tunnel. Longest prefix wins, so a /32 overrides a full tunnel.</p>
+      </div>
+      <div class="f">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 20 5v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V5z"/><path d="M9 12l2 2 4-4"/></svg>
+        <h3 data-t="f3t">Kill switch that fails closed</h3>
+        <p data-t="f3d">Built on pf. It snapshots your existing firewall rules and restores them on the way out, instead of trampling them.</p>
+      </div>
+      <div class="f">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v10"/><path d="M8 7l4-4 4 4"/><circle cx="12" cy="18" r="3"/></svg>
+        <h3 data-t="f4t">Conflicts caught at import</h3>
+        <p data-t="f4d">Overlapping ranges and a second full-tunnel config get flagged before they break your routing.</p>
+      </div>
+      <div class="f">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4.5-4.5"/></svg>
+        <h3 data-t="f5t">Prove it is actually routing</h3>
+        <p data-t="f5d">One click reports handshake age, round-trip, and the tunnel's exit IP next to your real public IP. A second check verifies each route against the kernel.</p>
+      </div>
+      <div class="f">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 0 1 8-8v3"/><path d="M20 12a8 8 0 0 1-8 8v-3"/></svg>
+        <h3 data-t="f6t">Endpoints that move</h3>
+        <p data-t="f6d">Hostname endpoints are re-resolved when they change, so a server on a dynamic address does not strand the tunnel.</p>
+      </div>
+      <div class="f">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v14H4z"/><path d="M7 9h6M7 13h10"/></svg>
+        <h3 data-t="f7t">Live logs, per tunnel and system-wide</h3>
+        <p data-t="f7d">Streamed straight from the engine, filterable, exportable. When something breaks you can see why.</p>
+      </div>
+      <div class="f">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18v10H3z"/><path d="M8 19h8"/></svg>
+        <h3 data-t="f8t">Menu bar and dashboard</h3>
+        <p data-t="f8d">Throughput and handshake age at a glance; the full window when you need to change something.</p>
+      </div>
+      <div class="f">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v14H4z"/><path d="M8 10l3 2-3 2"/><path d="M13 14h4"/></svg>
+        <h3 data-t="f9t">A real CLI</h3>
+        <p data-t="f9d">Every action in the app is also one command, over the same interface. Scriptable, JSON output.</p>
+      </div>
+      <div class="f">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4-8 4-8-4z"/><path d="M4 12l8 4 8-4"/></svg>
+        <h3 data-t="f10t">Config Studio</h3>
+        <p data-t="f10d">Author a server profile and its client configs, generate keys on-device, hand them out as files or QR codes.</p>
+      </div>
+      <div class="f">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 20 5v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V5z"/><path d="M12 8v4"/><circle cx="12" cy="15.5" r="1"/></svg>
+        <h3 data-t="f11t">Updates you can verify</h3>
+        <p data-t="f11d">Every release carries a SHA-256 and an Ed25519 signature, checked by the app and then independently again by the privileged service before anything installs.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SHOTS ============ -->
+  <section id="shots">
+    <div class="sec-head"><h2 data-t="shots-h">🖼️ The interface</h2></div>
+    <p class="muted" data-t="shots-sub">Dark and light both ship; the app follows your system setting.</p>
+    <div class="shots">
+      <figure class="shot-wide"><img src="assets/ui/dashboard.svg" alt="Dashboard with several tunnels, one connected, showing virtual IP, endpoint and throughput"><figcaption data-t="cap1">Dashboard — every tunnel, its state, and what it is moving.</figcaption></figure>
+      <figure><img src="assets/ui/smart-rules.svg" alt="Routing rules screen with per-address overrides"><figcaption data-t="cap2">Rules — send an address, a range, or a host down a chosen tunnel.</figcaption></figure>
+      <figure><img src="assets/ui/connection-test.svg" alt="Connection test result comparing tunnel exit IP against real public IP"><figcaption data-t="cap3">Connection test — exit IP against your real one, so you can prove it works.</figcaption></figure>
+      <figure><img src="assets/ui/add-tunnel.svg" alt="Add tunnel screen with file import, QR scan and manual entry"><figcaption data-t="cap4">Add a tunnel — import a <span class="mono">.conf</span>, scan a QR, or type it in.</figcaption></figure>
+      <figure><img src="assets/ui/menubar.svg" alt="Menu bar popover listing tunnels with handshake age and rate"><figcaption data-t="cap5">Menu bar — status without opening the window.</figcaption></figure>
+    </div>
+  </section>
+
+  <!-- ============ IN TESTING ============ -->
+  <section>
+    <div class="sec-head">
+      <h2 data-t="test-h">🧪 Built, still being proven</h2>
+      <span class="chip test" data-t="chip-test">not yet trusted</span>
+    </div>
+    <p class="lede" style="margin-top:6px" data-t="test-sub">These are written, tested in isolation, and shipping in the build — but they have not been run long enough on real machines for anyone to promise they work. They are listed here rather than sold to you.</p>
+    <div class="grid two">
+      <div class="card flag"><h3 data-t="b1t">Route by domain</h3><p data-t="b1d">Resolves a domain and pins the addresses it returns. Best-effort by nature: apps using DoH/DoT or hard-coded IPs slip past it, and large CDNs return pools that shift. It is a routing convenience, not a security control.</p></div>
+      <div class="card flag"><h3 data-t="b2t">Route by macOS user</h3><p data-t="b2d">On macOS this matches the user a process runs as — not the individual app. Genuine per-app routing needs an Apple entitlement WGSmart does not have, so it is deliberately described as per-user here.</p></div>
+      <div class="card flag"><h3 data-t="b3t">Route by port</h3><p data-t="b3d">Send a port or range down a chosen tunnel, TCP, UDP or both — matching on source or destination.</p></div>
+      <div class="card flag"><h3 data-t="b4t">DNS routing</h3><p data-t="b4d">A local resolver that watches answers to pin routes more accurately. Present but switched off by default, because a resolver that misbehaves takes the whole machine's DNS with it.</p></div>
+      <div class="card flag"><h3 data-t="b5t">Notification Center widget</h3><p data-t="b5d">Tunnel status at a glance without opening anything. Read-only — it shows state, it does not toggle tunnels.</p></div>
+      <div class="card flag"><h3 data-t="b6t">Linux and Windows</h3><p data-t="b6d">The engine cross-compiles and its tests pass for both, and a headless Linux service with a browser UI exists. Neither has been run against a real kernel yet, so neither is offered as a download.</p></div>
+    </div>
+  </section>
+
+  <!-- ============ DOWNLOAD ============ -->
+  <section id="download">
+    <div class="sec-head"><h2 data-t="dl-h">⬇️ Download</h2><span class="chip plan mono" id="ver-chip">v1.0.0</span></div>
+    <p class="lede" style="margin-top:6px" data-t="dl-sub">One installer. It places the app in Applications and installs the privileged service the tunnels need — WireGuard on macOS cannot route without one.</p>
+    <div class="cta">
+      <a class="btn btn-primary" id="dl-link" href="https://github.com/lyquyduong/WGSmart/releases/latest"><span data-t="dl-btn">Download</span>&nbsp;<span id="dl-file" class="mono"></span></a>
+      <a class="btn btn-ghost" id="notes-link" href="https://github.com/lyquyduong/WGSmart/releases"><span data-t="dl-notes">Release notes</span></a>
+    </div>
+    <p class="tiny" style="margin-top:12px" data-t="dl-req">Requires macOS 15 or later · Apple Silicon and Intel · about 19 MB</p>
+
+    <div class="note">
+      <h3 data-t="gk-h">macOS will warn you the first time. Here is exactly why.</h3>
+      <p data-t="gk-p1">WGSmart is not yet notarized by Apple. Notarization requires a paid Apple Developer membership, which this project does not have yet — so on first launch macOS will say the developer cannot be verified. That warning is accurate: Apple has not checked this build.</p>
+      <p data-t="gk-p2">To open it anyway: right-click the app and choose <b>Open</b>, then confirm once. You should not have to do this for a second time, or for later updates.</p>
+      <p data-t="gk-p3">If that trade is not one you want to make for a tool that runs with system privileges, that is a completely reasonable call — wait for the notarized build. It is the next thing being funded.</p>
+    </div>
+
+    <h3 style="margin-top:36px" data-t="vf-h">Verify what you downloaded</h3>
+    <p class="muted" style="margin-top:8px" data-t="vf-p">The checksum is published here, on a different host than the file itself. If someone tampered with the download, these will not match.</p>
+    <pre style="margin-top:14px"><span class="c"># compare against the value published on this page</span>
+shasum -a 256 <span id="sha-file">WGSmart-1.0.0.pkg</span>
+<b id="sha-hex">…published with the release…</b></pre>
+    <p class="tiny" style="margin-top:10px" data-t="vf-note">The in-app updater goes further: it checks the checksum and an Ed25519 signature, and the privileged service re-checks both itself before installing anything. The signing key has never been on GitHub, so a compromised account still cannot produce an update WGSmart will accept.</p>
+  </section>
+
+  <!-- ============ ROADMAP ============ -->
+  <section>
+    <div class="sec-head"><h2 data-t="rm-h">🗺️ What is next, and what is not happening</h2></div>
+    <div class="tscroll">
+      <table>
+        <thead><tr><th data-t="rm-c1">Item</th><th data-t="rm-c2">Status</th><th data-t="rm-c3">Detail</th></tr></thead>
+        <tbody>
+          <tr><td data-t="rm1">Apple notarization</td><td><span class="chip plan" data-t="rm-next">next</span></td><td data-t="rm1d">Removes the first-launch warning entirely. Waiting on the membership fee — see below.</td></tr>
+          <tr><td data-t="rm2">Linux server edition</td><td><span class="chip test" data-t="rm-testing">in testing</span></td><td data-t="rm2d">Headless service plus a browser UI, for running the hub on a VPS. Code is complete; it has not been run on a real Linux host.</td></tr>
+          <tr><td data-t="rm3">Windows</td><td><span class="chip plan" data-t="rm-later">later</span></td><td data-t="rm3d">The engine compiles for it. Routing by user and by port have no equivalent mechanism there yet, and the app fails those calls honestly rather than pretending.</td></tr>
+          <tr><td data-t="rm4">iOS</td><td><span class="chip no" data-t="rm-no">not planned</span></td><td data-t="rm4d">Apple's networking framework allows one active tunnel at a time, which removes the entire reason WGSmart exists.</td></tr>
+          <tr><td data-t="rm5">Mac App Store</td><td><span class="chip no" data-t="rm-no2">not possible</span></td><td data-t="rm5d">The privileged service and firewall access the app depends on are not allowed inside the App Store sandbox.</td></tr>
+          <tr><td data-t="rm6">Open source</td><td><span class="chip no" data-t="rm-no3">no</span></td><td data-t="rm6d">WGSmart is free to use, including at work, but the source is not published. Verifiable signed builds are offered in place of readable code.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ SUPPORT ============ -->
+  <section id="support">
+    <div class="sec-head"><h2 data-t="sp-h">💛 Free — and staying that way</h2></div>
+    <p class="lede" style="margin-top:6px" data-t="sp-sub">WGSmart is free and staying free. If it saved you from juggling configs by hand, a tip keeps it going for everyone. No pressure. 💛</p>
+
+    <div class="goal">
+      <div style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap">
+        <strong data-t="goal-t">First goal — Apple Developer membership</strong>
+        <span class="mono" style="color:var(--ink-3);font-size:.85rem">$0 / $99</span>
+      </div>
+      <div class="meter"><i style="width:0%"></i></div>
+      <p class="muted" data-t="goal-p">This is the one thing standing between WGSmart and an install with no scary warning. It is a yearly fee, and donations go to it first.</p>
+    </div>
+
+    <div class="pays">
+      <div class="pay">
+        <img src="assets/support/kofi-qr.png" alt="Ko-fi QR code">
+        <h3>Ko-fi</h3>
+        <p class="who">ko-fi.com/nkcoder</p>
+        <p class="tiny" data-t="pay1">Card or PayPal, international</p>
+      </div>
+      <div class="pay">
+        <img src="assets/support/bank-vietqr.png" alt="Bank transfer VietQR code">
+        <h3 data-t="pay2h">Bank transfer</h3>
+        <p class="who">LÝ QUÝ DƯƠNG<br>9007041118966</p>
+        <p class="tiny">Timo · BVBank · napas 247</p>
+        <button class="copy" data-copy="9007041118966" data-t="pay-copy">Copy account number</button>
+      </div>
+      <div class="pay">
+        <img src="assets/support/momo-qr.png" alt="MoMo QR code">
+        <h3>MoMo</h3>
+        <p class="who">LÝ QUÝ DƯƠNG</p>
+        <p class="tiny" data-t="pay3">Scan with the MoMo app</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FEEDBACK ============ -->
+  <section id="feedback">
+    <div class="sec-head"><h2 data-t="fb-h">🗣️ Found a bug? Want something?</h2></div>
+    <p class="lede" style="margin-top:6px" data-t="fb-sub">Issues and feature requests are tracked in the open on GitHub. Write in English, Vietnamese or Chinese — all three are read.</p>
+    <div class="grid two">
+      <div class="card"><h3 data-t="fb1t">Report a bug</h3><p data-t="fb1d">A short form asks for your version, your macOS, and what happened. The more precisely you can describe the routing you expected, the faster it gets fixed.</p></div>
+      <div class="card"><h3 data-t="fb2t">Request a feature</h3><p data-t="fb2d">Describe the problem you are trying to solve rather than the feature you imagine — it usually leads somewhere better.</p></div>
+      <div class="card"><h3 data-t="fb3t">Ask a question</h3><p data-t="fb3d">Questions and setup help go to Discussions, so issues stay a list of real defects.</p></div>
+      <div class="card"><h3 data-t="fb4t">Report a security issue</h3><p data-t="fb4d">Privately, never in a public issue. WGSmart runs a privileged service, so security reports are handled ahead of everything else. Use GitHub's private reporting, or <span class='mono'>wgsmart@solutions101.org</span>.</p></div>
+    </div>
+    <div class="note">
+      <h3 data-t="redact-h">Before you paste a log or a screenshot</h3>
+      <p data-t="redact-p">VPN diagnostics carry real addresses — server endpoints, your internal ranges, Wi-Fi network names, sometimes keys. Please remove them first. Nothing you post publicly can be un-posted.</p>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span data-t="foot1">WGSmart — free, closed-source, for macOS.</span>
+    <span style="color:var(--ink-4)">·</span>
+    <a href="#download" data-t="foot2">Download</a>
+    <a href="#support" data-t="foot3">Support</a>
+    <a href="#feedback" data-t="foot4">Issues</a>
+    <span class="mono" id="ver-foot" style="margin-left:auto;font-size:.8rem">v1.0.0</span>
+  </div>
+</footer>
+<script>
+const I18N = {
+  vi:{
+    "nav1":"Tính năng","nav2":"Hình ảnh","nav3":"Tải về","nav4":"Ủng hộ",
+    "how-h":"⚡ Hoạt động thế nào","how-sub":"Ba bước. Config thì bạn đã có sẵn.",
+    "s1t":"Import config của bạn","s1d":"Kéo vào một <span class='mono'>.conf</span>, quét QR, hoặc nhập tay. Dải IP trùng nhau và config full-tunnel thứ hai được cảnh báo ngay tại đó.",
+    "s2t":"Khai cái gì đi đường nào","s2d":"Ghim một địa chỉ hoặc một dải vào tunnel cụ thể. Prefix dài hơn thắng, nên một host có thể đi ra bằng đường khác với phần còn lại.",
+    "s3t":"Bật tất cả cùng lúc","s3d":"Mọi tunnel chạy song song, kèm kill switch fail-closed và một bài test chứng minh traffic thật sự đi đúng đường bạn khai.",
+    "badge-pre":"chưa phát hành","badge-os":"macOS 15+ · Apple Silicon &amp; Intel","badge-lic":"Miễn phí · mã nguồn đóng",
+    "cta-dl":"Tải cho macOS","cta-works":"Hiện tại chạy được gì",
+    "t1":"Khoá của bạn nằm trong Keychain macOS","t2":"Không cần tài khoản, không thu thập dữ liệu","t3":"Server của bạn, config của bạn",
+    "rack-title":"3 tunnel đang chạy","rack-ks":"Kill switch đang bật",
+    "lane1":"<b>0.0.0.0/0</b> — tất cả phần còn lại","lane2":"<b>10.20.0.0/16</b> — dịch vụ nội bộ","lane3":"<b>203.0.113.7/32</b> — một host, thắng cả full tunnel",
+    "rack-note":"Prefix dài hơn thắng: route <span class='mono'>/32</span> thắng full tunnel, nên một host có thể đi ra bằng đường khác với phần còn lại.",
+    "why-eye":"Vì sao có WGSmart","why-h":"Bắt đầu từ hai VPN mà cả hai đều phải bật.",
+    "why-p":"Hai server, hai config, cần dùng đồng thời — và một app chỉ giữ được một cái. Cách chống cháy là sửa <span class='mono'>AllowedIPs</span> bằng tay rồi restart tunnel suốt ngày. WGSmart ra đời để thay việc đó.",
+    "why-p2":"Đây không phải dịch vụ VPN. Không có server để mua, không có gì để đăng ký — bạn mang config WireGuard của mình, WGSmart là thứ khiến chúng chạy đúng.",
+    "now-h":"✨ Đang chạy tốt","chip-now":"dùng hằng ngày","now-sub":"Chính người viết dùng mỗi ngày trên macOS.",
+    "f1t":"Nhiều tunnel, cùng lúc","f1d":"Mỗi cái giữ AllowedIPs riêng, kết nối song song thay vì lần lượt.",
+    "f2t":"Đẩy địa chỉ nào qua tunnel nào cũng được","f2d":"Ghim một IP hoặc CIDR vào tunnel cụ thể. Prefix dài hơn thắng, nên /32 ghi đè cả full tunnel.",
+    "f3t":"Kill switch fail-closed","f3d":"Dựng trên pf. Nó chụp lại ruleset firewall đang có của bạn và phục hồi khi tắt, chứ không đạp lên.",
+    "f4t":"Bắt xung đột ngay khi import","f4d":"Dải IP trùng nhau và config full-tunnel thứ hai được cảnh báo trước khi làm hỏng routing.",
+    "f5t":"Chứng minh nó đang route thật","f5d":"Một click báo tuổi handshake, round-trip, và IP thoát của tunnel đặt cạnh IP công khai thật. Một kiểm tra nữa đối chiếu từng route với kernel.",
+    "f6t":"Endpoint hay đổi IP","f6d":"Endpoint dạng hostname được resolve lại khi thay đổi, nên server dùng IP động không làm tunnel chết.",
+    "f7t":"Log trực tiếp, theo tunnel và toàn hệ thống","f7d":"Stream thẳng từ engine, lọc được, export được. Hỏng cái gì là thấy ngay vì sao.",
+    "f8t":"Menu bar và dashboard","f8d":"Throughput và tuổi handshake nhìn là biết; mở cửa sổ đầy đủ khi cần sửa.",
+    "f9t":"CLI thật","f9d":"Mọi thao tác trong app đều có một câu lệnh tương ứng, qua cùng một interface. Script được, xuất JSON.",
+    "f10t":"Config Studio","f10d":"Soạn profile server và config client, sinh khoá ngay trên máy, phát ra dạng file hoặc QR.",
+    "f11t":"Bản cập nhật kiểm chứng được","f11d":"Mỗi bản có SHA-256 và chữ ký Ed25519, app kiểm tra rồi service quyền cao kiểm tra độc lập lần nữa trước khi cài.",
+    "shots-h":"🖼️ Giao diện","shots-sub":"Có cả sáng và tối; app theo cài đặt hệ thống của bạn.",
+    "cap1":"Dashboard — mọi tunnel, trạng thái, và lưu lượng đang chạy.","cap2":"Rules — đẩy một địa chỉ, một dải, hay một host qua tunnel bạn chọn.",
+    "cap3":"Test kết nối — IP thoát so với IP thật, để chứng minh nó hoạt động.","cap4":"Thêm tunnel — import <span class='mono'>.conf</span>, quét QR, hoặc nhập tay.","cap5":"Menu bar — xem trạng thái mà không cần mở cửa sổ.",
+    "test-h":"🧪 Đã viết, còn đang kiểm chứng","chip-test":"chưa dám bảo đảm",
+    "test-sub":"Những phần này đã viết xong, test riêng lẻ đạt, và có trong bản build — nhưng chưa chạy đủ lâu trên máy thật để ai dám hứa là ổn. Nên chúng được liệt kê ở đây, không phải để bán cho bạn.",
+    "b1t":"Route theo domain","b1d":"Resolve domain rồi ghim các địa chỉ nhận được. Bản chất là best-effort: app dùng DoH/DoT hoặc IP hard-code sẽ lọt qua, và CDN lớn trả về pool luôn thay đổi. Đây là tiện ích routing, không phải biện pháp bảo mật.",
+    "b2t":"Route theo user macOS","b2d":"Trên macOS cái này khớp theo user mà process chạy dưới — không phải từng app riêng. Route theo app thật sự cần một entitlement của Apple mà WGSmart không có, nên ở đây gọi đúng là theo user.",
+    "b3t":"Route theo cổng","b3d":"Đẩy một cổng hoặc một dải cổng qua tunnel chọn trước, TCP, UDP hoặc cả hai — khớp theo cổng nguồn hoặc cổng đích.",
+    "b4t":"Route theo DNS","b4d":"Một resolver cục bộ quan sát câu trả lời để ghim route chính xác hơn. Có sẵn nhưng mặc định tắt, vì một resolver chạy sai sẽ kéo theo DNS của cả máy.",
+    "b5t":"Widget Notification Center","b5d":"Trạng thái tunnel nhìn là biết, không cần mở gì. Chỉ đọc — nó hiện trạng thái, không bật tắt tunnel.",
+    "b6t":"Linux và Windows","b6d":"Engine cross-compile được và test đạt cho cả hai, và đã có service Linux headless kèm UI trên browser. Cả hai chưa chạy với kernel thật, nên chưa cái nào được đưa ra tải.",
+    "dl-h":"⬇️ Tải về","dl-sub":"Một bộ cài. Nó đặt app vào Applications và cài service quyền cao mà tunnel cần — WireGuard trên macOS không route được nếu thiếu.",
+    "dl-btn":"WGSmart-1.0.0.pkg","dl-notes":"Ghi chú phát hành","dl-req":"Cần macOS 15 trở lên · Apple Silicon và Intel · khoảng 19 MB",
+    "gk-h":"macOS sẽ cảnh báo ở lần đầu. Đây là lý do chính xác.",
+    "gk-p1":"WGSmart chưa được Apple notarize. Notarize cần tài khoản Apple Developer trả phí mà dự án chưa có — nên lần mở đầu macOS sẽ nói không xác minh được nhà phát triển. Cảnh báo đó là đúng: Apple chưa kiểm tra bản build này.",
+    "gk-p2":"Để mở: bấm chuột phải vào app, chọn <b>Open</b>, rồi xác nhận một lần. Lần thứ hai và các bản cập nhật sau sẽ không cần làm lại.",
+    "gk-p3":"Nếu bạn thấy đánh đổi đó không đáng cho một công cụ chạy với quyền hệ thống, thì đó là quyết định hoàn toàn hợp lý — hãy chờ bản đã notarize. Đó cũng là mục được ưu tiên gây quỹ.",
+    "vf-h":"Kiểm tra file bạn vừa tải","vf-p":"Checksum được công bố ở đây, trên một host khác với chỗ chứa file. Nếu có ai sửa file tải về, hai giá trị sẽ không khớp.",
+    "vf-note":"Bộ cập nhật trong app còn đi xa hơn: nó kiểm checksum và chữ ký Ed25519, rồi service quyền cao tự kiểm lại cả hai trước khi cài. Khoá ký chưa bao giờ nằm trên GitHub, nên tài khoản bị chiếm vẫn không tạo được bản cập nhật mà WGSmart chấp nhận.",
+    "rm-h":"🗺️ Sắp tới là gì, và cái gì sẽ không làm","rm-c1":"Mục","rm-c2":"Trạng thái","rm-c3":"Chi tiết",
+    "rm1":"Apple notarization","rm-next":"kế tiếp","rm1d":"Bỏ hẳn cảnh báo lần đầu. Đang chờ phí thành viên — xem bên dưới.",
+    "rm2":"Bản server Linux","rm-testing":"đang kiểm chứng","rm2d":"Service headless kèm UI trên browser, để chạy hub trên VPS. Code xong; chưa chạy trên host Linux thật.",
+    "rm3":"Windows","rm-later":"sau","rm3d":"Engine compile được. Route theo user và theo cổng chưa có cơ chế tương đương ở đó, và app báo lỗi trung thực chứ không giả vờ làm được.",
+    "rm4":"iOS","rm-no":"không làm","rm4d":"Framework mạng của Apple chỉ cho một tunnel hoạt động tại một thời điểm, tức là mất luôn lý do tồn tại của WGSmart.",
+    "rm5":"Mac App Store","rm-no2":"không thể","rm5d":"Service quyền cao và quyền truy cập firewall mà app cần đều không được phép trong sandbox App Store.",
+    "rm6":"Mã nguồn mở","rm-no3":"không","rm6d":"WGSmart miễn phí kể cả dùng cho công việc, nhưng không công bố mã nguồn. Thay vào đó là bản build có chữ ký kiểm chứng được.",
+    "sp-h":"💛 Miễn phí — và sẽ tiếp tục miễn phí","sp-sub":"WGSmart miễn phí và sẽ tiếp tục miễn phí. Nếu nó cứu bạn khỏi việc sửa config bằng tay, một ly cà phê giúp nó đi tiếp cho mọi người. Không áp lực gì. 💛",
+    "goal-t":"Mục tiêu đầu tiên — tài khoản Apple Developer","goal-p":"Đây là thứ duy nhất còn chắn giữa WGSmart và một lần cài không có cảnh báo đáng sợ. Phí này thu theo năm, và tiền ủng hộ sẽ dùng cho nó trước.",
+    "pay1":"Thẻ hoặc PayPal, quốc tế","pay2h":"Chuyển khoản","pay-copy":"Copy số tài khoản","pay3":"Quét bằng app MoMo",
+    "fb-h":"🗣️ Gặp lỗi? Muốn thêm tính năng?","fb-sub":"Lỗi và đề xuất được theo dõi công khai trên GitHub. Viết bằng tiếng Anh, tiếng Việt hay tiếng Trung đều được — cả ba đều được đọc.",
+    "fb1t":"Báo lỗi","fb1d":"Một form ngắn hỏi phiên bản, macOS của bạn, và chuyện gì đã xảy ra. Bạn mô tả càng chính xác cái routing bạn mong đợi thì sửa càng nhanh.",
+    "fb2t":"Đề xuất tính năng","fb2d":"Hãy kể vấn đề bạn đang cần giải, thay vì tính năng bạn hình dung — thường sẽ ra kết quả tốt hơn.",
+    "fb3t":"Đặt câu hỏi","fb3d":"Câu hỏi và nhờ hỗ trợ cài đặt đưa sang Discussions, để phần issue chỉ còn lỗi thật.",
+    "fb4t":"Báo lỗi bảo mật","fb4d":"Gửi riêng, đừng bao giờ mở issue công khai. WGSmart chạy một service quyền cao, nên báo cáo bảo mật được xử lý trước mọi thứ khác. Dùng kênh private của GitHub, hoặc <span class='mono'>wgsmart@solutions101.org</span>.",
+    "redact-h":"Trước khi dán log hay ảnh chụp","redact-p":"Log VPN mang địa chỉ thật — endpoint server, dải mạng nội bộ, tên WiFi, có khi cả khoá. Hãy xoá chúng trước. Thứ đã đăng công khai thì không rút lại được.",
+    "foot1":"WGSmart — miễn phí, mã nguồn đóng, cho macOS.","foot2":"Tải về","foot3":"Ủng hộ","foot4":"Báo lỗi"
+  },
+  zh:{
+    "nav1":"功能","nav2":"界面","nav3":"下载","nav4":"支持",
+    "how-h":"⚡ 工作方式","how-sub":"三步。配置你本来就有。",
+    "s1t":"导入你的配置","s1d":"拖入一个 <span class='mono'>.conf</span>、扫描二维码，或手动输入。重叠的地址段和第二份全局隧道配置会当场被标出来。",
+    "s2t":"指定什么走哪条","s2d":"把一个地址或网段钉到指定隧道。更长的前缀优先，因此单个主机可以走与其他流量不同的出口。",
+    "s3t":"让它们同时连上","s3d":"所有隧道并行运行，配上故障即断网的开关，以及一项证明流量确实按你所说走的测试。",
+    "badge-pre":"预发布","badge-os":"macOS 15+ · Apple Silicon 与 Intel","badge-lic":"免费 · 闭源",
+    "cta-dl":"下载 macOS 版","cta-works":"目前真正可用的功能",
+    "t1":"密钥保存在 macOS 钥匙串中","t2":"无需账号，不收集数据","t3":"你自己的服务器，你自己的配置",
+    "rack-title":"3 条隧道运行中","rack-ks":"断网保护已启用",
+    "lane1":"<b>0.0.0.0/0</b> — 其余全部流量","lane2":"<b>10.20.0.0/16</b> — 内部服务","lane3":"<b>203.0.113.7/32</b> — 单个主机，优先于全局隧道",
+    "rack-note":"更长的前缀优先：<span class='mono'>/32</span> 路由优先于全局隧道，因此单个主机可以走与其他流量不同的出口。",
+    "why-eye":"缘起","why-h":"起因是两个必须同时开着的 VPN。",
+    "why-p":"两台服务器、两份配置、必须同时使用——而客户端一次只能装下一份。当时的权宜之计是手改 <span class='mono'>AllowedIPs</span>，然后整天重启隧道。WGSmart 就是用来取代这件事的。",
+    "why-p2":"它不是 VPN 服务。没有可订阅的服务器，也没有要注册的东西——你带来自己的 WireGuard 配置，WGSmart 负责让它们各就各位。",
+    "now-h":"✨ 已经好用","chip-now":"每天在用","now-sub":"作者本人每天在 macOS 上使用。",
+    "f1t":"多条隧道同时运行","f1d":"各自保留自己的 AllowedIPs，并行连接，而不是轮流上线。",
+    "f2t":"任意地址走任意隧道","f2d":"把某个 IP 或 CIDR 钉到指定隧道。更长的前缀优先，因此 /32 可以覆盖全局隧道。",
+    "f3t":"故障即断网的开关","f3d":"基于 pf 构建。它会先快照你现有的防火墙规则，退出时再还原，而不是直接覆盖。",
+    "f4t":"导入时就发现冲突","f4d":"重叠的地址段、第二份全局隧道配置，会在破坏路由之前被标出来。",
+    "f5t":"证明它真的在分流","f5d":"一次点击就报告握手时间、往返延迟，以及隧道出口 IP 与你真实公网 IP 的对比。另一项检查会逐条对照内核验证路由。",
+    "f6t":"会变动的端点","f6d":"域名端点在变化时会重新解析，动态地址的服务器不会让隧道卡死。",
+    "f7t":"实时日志，按隧道也按全局","f7d":"直接从引擎流出，可筛选、可导出。出问题时你能看见原因。",
+    "f8t":"菜单栏与主面板","f8d":"吞吐量与握手时间一眼可见；需要改动时再打开完整窗口。",
+    "f9t":"完整的命令行","f9d":"应用里的每个操作都有对应的一条命令，走同一套接口。可脚本化，支持 JSON 输出。",
+    "f10t":"配置工作台","f10d":"编写服务端配置及其客户端配置，在本机生成密钥，以文件或二维码分发。",
+    "f11t":"可自行核验的更新","f11d":"每个版本都带 SHA-256 与 Ed25519 签名，应用核验一次，特权服务在安装前再独立核验一次。",
+    "shots-h":"🖼️ 界面","shots-sub":"深色与浅色都有；应用跟随你的系统设置。",
+    "cap1":"主面板——所有隧道、状态，以及正在传输的流量。","cap2":"规则——把一个地址、一个网段或一台主机送进指定隧道。",
+    "cap3":"连接测试——出口 IP 与真实 IP 对照，用来证明它确实生效。","cap4":"添加隧道——导入 <span class='mono'>.conf</span>、扫描二维码，或手动输入。","cap5":"菜单栏——不打开窗口也能看状态。",
+    "test-h":"🧪 已写好，仍在验证","chip-test":"尚不敢保证",
+    "test-sub":"这些功能已经写完、单独测试通过，并且随版本发布——但还没有在真实机器上跑够久，没人能保证它们可靠。所以它们列在这里，而不是拿来向你推销。",
+    "b1t":"按域名分流","b1d":"解析域名并钉住返回的地址。本质上是尽力而为：使用 DoH/DoT 或硬编码 IP 的应用会绕过它，大型 CDN 返回的地址池也一直在变。这是路由上的便利，不是安全手段。",
+    "b2t":"按 macOS 用户分流","b2d":"在 macOS 上，它匹配的是进程所属的用户——不是单个应用。真正的按应用分流需要一项 WGSmart 并不具备的 Apple 权限，所以这里如实称为按用户。",
+    "b3t":"按端口分流","b3d":"把某个端口或端口段送进指定隧道，TCP、UDP 或两者皆可——按源端口或目标端口匹配。",
+    "b4t":"按 DNS 分流","b4d":"一个本地解析器，通过观察应答来更准确地钉住路由。已经内置但默认关闭，因为解析器一旦出错，整台机器的 DNS 都会跟着出问题。",
+    "b5t":"通知中心小组件","b5d":"不打开任何东西就能看到隧道状态。只读——它显示状态，不切换隧道。",
+    "b6t":"Linux 与 Windows","b6d":"引擎能为两者交叉编译且测试通过，也已经有无界面的 Linux 服务和浏览器 UI。两者都还没在真实内核上跑过，所以都还不提供下载。",
+    "dl-h":"⬇️ 下载","dl-sub":"一个安装包。它把应用放进「应用程序」，并安装隧道所需的特权服务——macOS 上的 WireGuard 没有它就无法分流。",
+    "dl-btn":"WGSmart-1.0.0.pkg","dl-notes":"版本说明","dl-req":"需要 macOS 15 或更高 · Apple Silicon 与 Intel · 约 19 MB",
+    "gk-h":"首次打开时 macOS 会警告。原因如下。",
+    "gk-p1":"WGSmart 尚未通过 Apple 公证。公证需要付费的 Apple Developer 会员资格，本项目目前还没有——所以首次打开时 macOS 会说无法验证开发者。那条警告是准确的：Apple 确实没有检查过这个版本。",
+    "gk-p2":"要照常打开：右键点击应用，选择<b>打开</b>，然后确认一次。第二次以及后续更新都不需要再这样做。",
+    "gk-p3":"如果你觉得为一个以系统权限运行的工具做这种取舍并不值得，那是完全合理的判断——请等公证版本。它正是当前优先筹措的目标。",
+    "vf-h":"核验你下载的文件","vf-p":"校验值发布在本页，与文件本身不在同一台主机上。如果有人改动过下载文件，两者就不会一致。",
+    "vf-note":"应用内的更新流程走得更远：它核验校验值与 Ed25519 签名，特权服务在安装前还会自己再核验一遍。签名密钥从未放在 GitHub 上，因此即便账号被攻破，也无法造出 WGSmart 会接受的更新。",
+    "rm-h":"🗺️ 接下来做什么，以及不会做什么","rm-c1":"项目","rm-c2":"状态","rm-c3":"说明",
+    "rm1":"Apple 公证","rm-next":"下一步","rm1d":"彻底消除首次打开的警告。正在等会员费——见下文。",
+    "rm2":"Linux 服务端版本","rm-testing":"验证中","rm2d":"无界面服务加浏览器 UI，用于在 VPS 上运行中枢。代码已完成；尚未在真实 Linux 主机上运行。",
+    "rm3":"Windows","rm-later":"以后","rm3d":"引擎可以为它编译。按用户和按端口分流在那里还没有对应机制，应用会如实报错，而不是假装支持。",
+    "rm4":"iOS","rm-no":"不做","rm4d":"Apple 的网络框架一次只允许一条隧道活动，这等于抹掉了 WGSmart 存在的全部理由。",
+    "rm5":"Mac App Store","rm-no2":"不可能","rm5d":"应用依赖的特权服务与防火墙访问，在 App Store 沙盒里都是不被允许的。",
+    "rm6":"开源","rm-no3":"否","rm6d":"WGSmart 免费使用，包括用于工作，但源码不公开。作为替代，提供可核验的签名构建。",
+    "sp-h":"💛 免费 —— 而且会一直免费","sp-sub":"WGSmart 是免费的，而且会一直免费。如果它让你不必再手改配置，一点心意就能让它为所有人继续走下去。没有压力。💛",
+    "goal-t":"第一个目标 —— Apple Developer 会员资格","goal-p":"这是 WGSmart 与「安装时没有可怕警告」之间唯一的阻碍。这是一笔年费，捐款会优先用于它。",
+    "pay1":"银行卡或 PayPal，国际通用","pay2h":"银行转账","pay-copy":"复制账号","pay3":"用 MoMo 应用扫码",
+    "fb-h":"🗣️ 发现问题？想要新功能？","fb-sub":"问题与功能请求都在 GitHub 上公开跟踪。用英文、越南文或中文写都可以——三种都会被读到。",
+    "fb1t":"报告问题","fb1d":"一份简短表单会询问你的版本、你的 macOS，以及发生了什么。你把期望的分流行为描述得越准确，修得就越快。",
+    "fb2t":"请求功能","fb2d":"请描述你想解决的问题，而不是你设想的功能——这样通常会得到更好的结果。",
+    "fb3t":"提问","fb3d":"提问和安装求助请发到 Discussions，让 issue 列表只留真实缺陷。",
+    "fb4t":"报告安全问题","fb4d":"请私下提交，绝不要开公开 issue。WGSmart 运行着一个特权服务，因此安全报告会优先于其他一切处理。请使用 GitHub 的私密报告渠道，或发送至 <span class='mono'>wgsmart@solutions101.org</span>。",
+    "redact-h":"在粘贴日志或截图之前","redact-p":"VPN 诊断信息里带着真实地址——服务器端点、你的内网网段、Wi-Fi 名称，有时还有密钥。请先去掉它们。公开发出去的东西是收不回来的。",
+    "foot1":"WGSmart —— 免费、闭源、面向 macOS。","foot2":"下载","foot3":"支持","foot4":"问题反馈"
+  }
+};
+const EN = {};
+document.querySelectorAll("[data-t]").forEach(el=>EN[el.dataset.t]=el.innerHTML);
+
+function setLang(l){
+  document.querySelectorAll("[data-lang]").forEach(b=>b.classList.toggle("on",b.dataset.lang===l));
+  const dict = l==="en" ? EN : I18N[l];
+  document.querySelectorAll("[data-t]").forEach(el=>{
+    const v = dict[el.dataset.t];
+    if(v!==undefined) el.innerHTML=v; else el.innerHTML=EN[el.dataset.t];
+  });
+  document.querySelectorAll(".langs button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.set===l)));
+  document.documentElement.lang = l==="zh"?"zh-Hans":l;
+  try{localStorage.setItem("wgs-lang",l)}catch(e){}
+  if(typeof applyRelease === "function") applyRelease();
+}
+document.querySelectorAll(".langs button").forEach(b=>b.addEventListener("click",()=>setLang(b.dataset.set)));
+
+let start="en";
+try{
+  const saved=localStorage.getItem("wgs-lang");
+  if(saved) start=saved;
+  else{
+    const n=(navigator.language||"en").toLowerCase();
+    if(n.startsWith("vi")) start="vi"; else if(n.startsWith("zh")) start="zh";
+  }
+}catch(e){}
+setLang(start);
+applyRelease();
+
+document.querySelectorAll(".copy").forEach(b=>{
+  b.addEventListener("click",async()=>{
+    try{
+      await navigator.clipboard.writeText(b.dataset.copy);
+      const o=b.textContent; b.textContent="Copied";
+      setTimeout(()=>b.textContent=o,1600);
+    }catch(e){}
+  });
+});
+
+// funding meter: animate to its real value (currently zero raised)
+const RAISED=0, TARGET=99;
+requestAnimationFrame(()=>{
+  const m=document.querySelector(".meter i");
+  if(m) m.style.transition="width .9s ease", m.style.width=Math.min(100,RAISED/TARGET*100)+"%";
+});
+
+// ---- Live release data, read from OUR OWN manifest -----------------------------------------
+// Deliberately not api.github.com: that is 60 requests/hour per IP and would throttle this page
+// for everyone behind a shared address. updates.json is the same file the app reads.
+var RELEASE = null;   // var, not let: applyRelease() may run before this line (hoisting)
+function applyRelease(){
+  if(!RELEASE) return;
+  const v = RELEASE.version, p = RELEASE.platform;
+  const set = (id, fn) => { const el = document.getElementById(id); if(el) fn(el); };
+  set("ver-badge", e => e.textContent = "v" + v);
+  set("ver-chip",  e => e.textContent = "v" + v);
+  set("ver-foot",  e => e.textContent = "v" + v);
+  if(p){
+    const name = p.filename || ("WGSmart-" + v + ".pkg");
+    set("dl-file",  e => e.textContent = name);
+    set("dl-link",  e => { if(p.url) e.href = p.url; });
+    set("sha-file", e => e.textContent = name);
+    set("sha-hex",  e => { if(p.sha256) e.textContent = p.sha256; });
+  }
+  if(RELEASE.notes) set("notes-link", e => e.href = RELEASE.notes);
+}
+(async () => {
+  try{
+    const r = await fetch("updates.json", {cache: "no-cache"});
+    if(!r.ok) return;                       // no release published yet — leave the static copy
+    const m = await r.json();
+    const ch = m.channels && (m.channels.stable || Object.values(m.channels)[0]);
+    if(!ch) return;
+    RELEASE = {
+      version: ch.version,
+      notes: ch.release_notes_url,
+      platform: ch.platforms && (ch.platforms["darwin-universal"] || Object.values(ch.platforms)[0]),
+    };
+    applyRelease();
+  }catch(e){ /* static fallback is fine */ }
+})();
+</script>
+
+</body>
+</html>
