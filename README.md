@@ -40,7 +40,7 @@ Run and route **multiple WireGuard tunnels at once** — with per-IP control the
 <br/>
 
 <!-- Landing hero image. To swap for a real screenshot, see assets/screenshots/MANIFEST.md -->
-<img src="https://raw.githubusercontent.com/lyquyduong/WGSmart/docs/assets/ui/dashboard.svg" width="760" alt="WGSmart dashboard — multiple tunnels active at once" />
+<img src="https://raw.githubusercontent.com/lyquyduong/WGSmart/docs/assets/screenshots/dashboard.png" width="760" alt="WGSmart dashboard — multiple tunnels active at once" />
 
 </div>
 
@@ -89,7 +89,7 @@ Written, tested in isolation, and shipping in the build — but not yet run long
 
 | Add a tunnel | Smart Rules | Connection test |
 |---|---|---|
-| ![Add a tunnel — import a .conf, conflicts flagged on the spot](https://raw.githubusercontent.com/lyquyduong/WGSmart/docs/assets/ui/add-tunnel.svg) | ![Smart Rules — per-IP routing overrides](https://raw.githubusercontent.com/lyquyduong/WGSmart/docs/assets/ui/smart-rules.svg) | ![Connection test — tunnel exit IP vs public IP](https://raw.githubusercontent.com/lyquyduong/WGSmart/docs/assets/ui/connection-test.svg) |
+| ![Add a tunnel — import a .conf, conflicts flagged on the spot](https://raw.githubusercontent.com/lyquyduong/WGSmart/docs/assets/screenshots/tunnels.png) | ![Smart Rules — per-IP routing overrides](https://raw.githubusercontent.com/lyquyduong/WGSmart/docs/assets/ui/smart-rules.svg) | ![Connection test — tunnel exit IP vs public IP](https://raw.githubusercontent.com/lyquyduong/WGSmart/docs/assets/ui/connection-test.svg) |
 
 <p align="center"><img src="https://raw.githubusercontent.com/lyquyduong/WGSmart/docs/assets/ui/menubar.svg" width="340" alt="Menu-bar popover — live status and throughput" /></p>
 

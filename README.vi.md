@@ -40,7 +40,7 @@ Run and route **multiple WireGuard tunnels at once** — with per-IP control the
 <br/>
 
 <!-- Landing hero image. To swap for a real screenshot, see assets/screenshots/MANIFEST.md -->
-<img src="https://raw.githubusercontent.com/lyquyduong/WGSmart/docs/assets/ui/dashboard.svg" width="760" alt="WGSmart dashboard — multiple tunnels active at once" />
+<img src="https://raw.githubusercontent.com/lyquyduong/WGSmart/docs/assets/screenshots/dashboard.png" width="760" alt="WGSmart dashboard — multiple tunnels active at once" />
 
 </div>
 
@@ -89,7 +89,7 @@ Chính người viết dùng mỗi ngày trên macOS.
 
 | Thêm tunnel | Smart Rules | Test kết nối |
 |---|---|---|
-| ![Thêm tunnel — import .conf, báo xung đột ngay](https://raw.githubusercontent.com/lyquyduong/WGSmart/docs/assets/ui/add-tunnel.svg) | ![Smart Rules — ghi đè định tuyến theo IP](https://raw.githubusercontent.com/lyquyduong/WGSmart/docs/assets/ui/smart-rules.svg) | ![Test kết nối — IP thoát tunnel vs IP công khai](https://raw.githubusercontent.com/lyquyduong/WGSmart/docs/assets/ui/connection-test.svg) |
+| ![Thêm tunnel — import .conf, báo xung đột ngay](https://raw.githubusercontent.com/lyquyduong/WGSmart/docs/assets/screenshots/tunnels.png) | ![Smart Rules — ghi đè định tuyến theo IP](https://raw.githubusercontent.com/lyquyduong/WGSmart/docs/assets/ui/smart-rules.svg) | ![Test kết nối — IP thoát tunnel vs IP công khai](https://raw.githubusercontent.com/lyquyduong/WGSmart/docs/assets/ui/connection-test.svg) |
 
 <p align="center"><img src="https://raw.githubusercontent.com/lyquyduong/WGSmart/docs/assets/ui/menubar.svg" width="340" alt="Popover menu bar — trạng thái và lưu lượng trực tiếp" /></p>
 
