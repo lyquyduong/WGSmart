@@ -14,7 +14,7 @@
 <meta property="og:title" content="WGSmart — every WireGuard tunnel up at once">
 <meta property="og:description" content="The official WireGuard client runs one tunnel at a time. WGSmart runs all of them, and sends each destination down the tunnel you pick.">
 <meta property="og:url" content="https://wgsmart.base101.app/">
-<meta property="og:image" content="https://wgsmart.base101.app/assets/ui/dashboard.svg">
+<meta property="og:image" content="https://wgsmart.base101.app/assets/screenshots/dashboard.png">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
@@ -439,10 +439,10 @@
     <div class="sec-head"><h2 data-t="shots-h">🖼️ The interface</h2></div>
     <p class="muted" data-t="shots-sub">Dark and light both ship; the app follows your system setting.</p>
     <div class="shots">
-      <figure class="shot-wide"><img src="assets/ui/dashboard.svg" alt="Dashboard with several tunnels, one connected, showing virtual IP, endpoint and throughput"><figcaption data-t="cap1">Dashboard — every tunnel, its state, and what it is moving.</figcaption></figure>
+      <figure class="shot-wide"><img src="assets/screenshots/dashboard.png" alt="WGSmart dashboard: four tunnels configured, two connected at once, each showing its virtual IP, endpoint and live throughput"><figcaption data-t="cap1">Dashboard — every tunnel, its state, and what it is moving.</figcaption></figure>
       <figure><img src="assets/ui/smart-rules.svg" alt="Routing rules screen with per-address overrides"><figcaption data-t="cap2">Rules — send an address, a range, or a host down a chosen tunnel.</figcaption></figure>
       <figure><img src="assets/ui/connection-test.svg" alt="Connection test result comparing tunnel exit IP against real public IP"><figcaption data-t="cap3">Connection test — exit IP against your real one, so you can prove it works.</figcaption></figure>
-      <figure><img src="assets/ui/add-tunnel.svg" alt="Add tunnel screen with file import, QR scan and manual entry"><figcaption data-t="cap4">Add a tunnel — import a <span class="mono">.conf</span>, scan a QR, or type it in.</figcaption></figure>
+      <figure><img src="assets/screenshots/tunnels.png" alt="Tunnels list showing four tunnels with status, virtual IP, endpoint and per-tunnel throughput"><figcaption data-t="cap4">Every tunnel at a glance — filter by state, search, and see what each one is moving.</figcaption></figure>
       <figure><img src="assets/ui/menubar.svg" alt="Menu bar popover listing tunnels with handshake age and rate"><figcaption data-t="cap5">Menu bar — status without opening the window.</figcaption></figure>
     </div>
   </section>
@@ -602,7 +602,7 @@ const I18N = {
     "f11t":"Bản cập nhật kiểm chứng được","f11d":"Mỗi bản có SHA-256 và chữ ký Ed25519, app kiểm tra rồi service quyền cao kiểm tra độc lập lần nữa trước khi cài.",
     "shots-h":"🖼️ Giao diện","shots-sub":"Có cả sáng và tối; app theo cài đặt hệ thống của bạn.",
     "cap1":"Dashboard — mọi tunnel, trạng thái, và lưu lượng đang chạy.","cap2":"Rules — đẩy một địa chỉ, một dải, hay một host qua tunnel bạn chọn.",
-    "cap3":"Test kết nối — IP thoát so với IP thật, để chứng minh nó hoạt động.","cap4":"Thêm tunnel — import <span class='mono'>.conf</span>, quét QR, hoặc nhập tay.","cap5":"Menu bar — xem trạng thái mà không cần mở cửa sổ.",
+    "cap3":"Test kết nối — IP thoát so với IP thật, để chứng minh nó hoạt động.","cap4":"Mọi tunnel trong một màn — lọc theo trạng thái, tìm kiếm, và thấy từng cái đang chạy bao nhiêu.","cap5":"Menu bar — xem trạng thái mà không cần mở cửa sổ.",
     "test-h":"🧪 Đã viết, còn đang kiểm chứng","chip-test":"chưa dám bảo đảm",
     "test-sub":"Những phần này đã viết xong, test riêng lẻ đạt, và có trong bản build — nhưng chưa chạy đủ lâu trên máy thật để ai dám hứa là ổn. Nên chúng được liệt kê ở đây, không phải để bán cho bạn.",
     "b1t":"Route theo domain","b1d":"Resolve domain rồi ghim các địa chỉ nhận được. Bản chất là best-effort: app dùng DoH/DoT hoặc IP hard-code sẽ lọt qua, và CDN lớn trả về pool luôn thay đổi. Đây là tiện ích routing, không phải biện pháp bảo mật.",
@@ -666,7 +666,7 @@ const I18N = {
     "f11t":"可自行核验的更新","f11d":"每个版本都带 SHA-256 与 Ed25519 签名，应用核验一次，特权服务在安装前再独立核验一次。",
     "shots-h":"🖼️ 界面","shots-sub":"深色与浅色都有；应用跟随你的系统设置。",
     "cap1":"主面板——所有隧道、状态，以及正在传输的流量。","cap2":"规则——把一个地址、一个网段或一台主机送进指定隧道。",
-    "cap3":"连接测试——出口 IP 与真实 IP 对照，用来证明它确实生效。","cap4":"添加隧道——导入 <span class='mono'>.conf</span>、扫描二维码，或手动输入。","cap5":"菜单栏——不打开窗口也能看状态。",
+    "cap3":"连接测试——出口 IP 与真实 IP 对照，用来证明它确实生效。","cap4":"所有隧道一览 —— 按状态筛选、搜索，并看到每条隧道正在传输多少。","cap5":"菜单栏——不打开窗口也能看状态。",
     "test-h":"🧪 已写好，仍在验证","chip-test":"尚不敢保证",
     "test-sub":"这些功能已经写完、单独测试通过，并且随版本发布——但还没有在真实机器上跑够久，没人能保证它们可靠。所以它们列在这里，而不是拿来向你推销。",
     "b1t":"按域名分流","b1d":"解析域名并钉住返回的地址。本质上是尽力而为：使用 DoH/DoT 或硬编码 IP 的应用会绕过它，大型 CDN 返回的地址池也一直在变。这是路由上的便利，不是安全手段。",
