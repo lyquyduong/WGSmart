@@ -1,0 +1,112 @@
+name: Bug report
+description: Something in WGSmart does not work the way it should
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this.
+
+        **Write in English, Tiếng Việt or 中文 — all three are read.**
+
+        ### ⚠️ Before you paste anything
+
+        VPN diagnostics carry real data: server endpoints, your internal IP ranges, Wi-Fi
+        network names, and sometimes private keys. **Please remove them first.** Replace real
+        addresses with placeholders like `198.51.100.1` and real names with `Server A`.
+
+        Nothing posted publicly can be un-posted.
+
+  - type: input
+    id: version
+    attributes:
+      label: WGSmart version
+      description: Settings ▸ Updates shows both the app and the background service version.
+      placeholder: "app 1.0.0 · service 1.0.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: macos
+    attributes:
+      label: macOS version
+      options:
+        - "macOS 26"
+        - "macOS 15"
+        - "Older than macOS 15 (not supported)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: arch
+    attributes:
+      label: Mac model
+      options:
+        - "Apple Silicon (M-series)"
+        - "Intel"
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you did, and what WGSmart did instead of what you expected.
+      placeholder: |
+        I connected the Tokyo tunnel and added a rule sending 10.20.0.0/16 to the Office
+        tunnel. Traffic to 10.20.0.5 still left through Tokyo.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-routing
+    attributes:
+      label: What routing did you expect?
+      description: |
+        For anything involving rules or multiple tunnels, this is the single most useful
+        field. Which addresses should have gone down which tunnel?
+      placeholder: |
+        10.20.0.0/16  → Office
+        everything else → Tokyo
+    validations:
+      required: false
+
+  - type: input
+    id: tunnels
+    attributes:
+      label: How many tunnels were configured, and how many were connected?
+      placeholder: "3 configured, 2 connected"
+    validations:
+      required: false
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. …
+        2. …
+        3. …
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log lines (redacted)
+      description: |
+        Logs ▸ filter, or `wgsmart logs`. Paste only the lines around the failure —
+        with endpoints, internal ranges, Wi-Fi names and keys removed.
+      render: text
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: confirms
+    attributes:
+      label: Before submitting
+      options:
+        - label: I removed real endpoints, IP ranges, Wi-Fi names and keys from everything above.
+          required: true
+        - label: This is a defect, not a question. (Questions go to Discussions.)
+          required: true

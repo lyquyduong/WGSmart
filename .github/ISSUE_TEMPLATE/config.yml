@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question, or help setting something up
+    url: https://github.com/lyquyduong/WGSmart/discussions
+    about: Ask in Discussions so Issues stays a list of real defects. English, Tiếng Việt and 中文 all welcome.
+  - name: Report a security vulnerability (privately)
+    url: https://github.com/lyquyduong/WGSmart/security/advisories/new
+    about: WGSmart installs a service that runs with system privileges. Never report security issues in a public issue.
+  - name: Support the project
+    url: https://wgsmart.base101.app/#support
+    about: Ko-fi, bank transfer or MoMo. The first goal is the Apple Developer membership that removes the first-launch warning.
