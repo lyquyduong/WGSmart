@@ -1,0 +1,59 @@
+name: Feature request
+description: Suggest something WGSmart should be able to do
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Write in English, Tiếng Việt or 中文 — all three are read.**
+
+        Please describe **the problem you are trying to solve** rather than the feature you
+        have in mind. It usually leads somewhere better than the original idea.
+
+        Worth checking first: the landing page splits features into *Working now* and
+        *Built, still being proven*. Some things already exist but are not finished enough
+        to advertise — routing by domain, by macOS user, and by port are all in that second
+        group.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: The situation you are in, and what makes it awkward today.
+      placeholder: |
+        I need traffic for one client's subnet to leave through their VPN, but only during
+        work hours — right now I toggle the rule by hand twice a day.
+    validations:
+      required: true
+
+  - type: textarea
+    id: workaround
+    attributes:
+      label: How do you handle it now?
+      description: Even an ugly workaround tells us a lot about the real shape of the problem.
+    validations:
+      required: false
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: What did you have in mind? (optional)
+      description: If you already have a solution in mind, describe it here.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Which part of WGSmart is this about?
+      options:
+        - "Tunnels and connecting"
+        - "Routing rules (address, domain, user, port)"
+        - "Kill switch / leak protection"
+        - "Menu bar, dashboard or widget"
+        - "Command line"
+        - "Server / hub mode"
+        - "Updates and installation"
+        - "Something else"
+    validations:
+      required: true
