@@ -303,7 +303,7 @@
 
     <div class="trust">
       <div><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10 1.5 17 4v6.2c0 4.4-2.9 8-7 9.3-4.1-1.3-7-4.9-7-9.3V4z"/></svg><span data-t="t1">Your keys stay in the macOS Keychain</span></div>
-      <div><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10 1.5 17 4v6.2c0 4.4-2.9 8-7 9.3-4.1-1.3-7-4.9-7-9.3V4z"/></svg><span data-t="t2">No account, no telemetry</span></div>
+      <div><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10 1.5 17 4v6.2c0 4.4-2.9 8-7 9.3-4.1-1.3-7-4.9-7-9.3V4z"/></svg><span data-t="t2">The app has no account and sends no telemetry</span></div>
       <div><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10 1.5 17 4v6.2c0 4.4-2.9 8-7 9.3-4.1-1.3-7-4.9-7-9.3V4z"/></svg><span data-t="t3">Your own servers, your own configs</span></div>
     </div>
 
@@ -552,7 +552,7 @@ shasum -a 256 <span id="sha-file">WGSmart-1.0.0.pkg</span>
       <div class="card"><h3 data-t="fb1t">Report a bug</h3><p data-t="fb1d">A short form asks for your version, your macOS, and what happened. The more precisely you can describe the routing you expected, the faster it gets fixed.</p></div>
       <div class="card"><h3 data-t="fb2t">Request a feature</h3><p data-t="fb2d">Describe the problem you are trying to solve rather than the feature you imagine — it usually leads somewhere better.</p></div>
       <div class="card"><h3 data-t="fb3t">Ask a question</h3><p data-t="fb3d">Questions and setup help go to Discussions, so issues stay a list of real defects.</p></div>
-      <div class="card"><h3 data-t="fb4t">Report a security issue</h3><p data-t="fb4d">Privately, never in a public issue. WGSmart runs a privileged service, so security reports are handled ahead of everything else. Use GitHub's private reporting, or <span class='mono'>wgsmart@solutions101.org</span>.</p></div>
+      <div class="card"><h3 data-t="fb4t">Report a security issue</h3><p data-t="fb4d">Privately, never in a public issue. WGSmart runs a privileged service, so security reports are handled ahead of everything else.</p><p class="tiny"><a href="https://github.com/lyquyduong/WGSmart/security/advisories/new"><b data-t="fb4link">Open a private advisory</b></a> &nbsp;·&nbsp; <span class='mono'>wgsmart@solutions101.org</span></p></div>
     </div>
     <div class="note">
       <h3 data-t="redact-h">Before you paste a log or a screenshot</h3>
@@ -563,7 +563,7 @@ shasum -a 256 <span id="sha-file">WGSmart-1.0.0.pkg</span>
 
 <footer>
   <div class="wrap">
-    <span data-t="foot1">WGSmart — free, closed-source, for macOS.</span>
+    <span data-t="foot1">WGSmart — free, closed-source, for macOS.</span><span style="color:var(--ink-4)">·</span><span class="tiny" data-t="foot-privacy">This site counts page views with Cloudflare Web Analytics: no cookies, no fingerprinting, no cross-site tracking. The app itself sends nothing.</span>
     <span style="color:var(--ink-4)">·</span>
     <a href="#download" data-t="foot2">Download</a>
     <a href="#support" data-t="foot3">Support</a>
@@ -574,6 +574,8 @@ shasum -a 256 <span id="sha-file">WGSmart-1.0.0.pkg</span>
 <script>
 const I18N = {
   vi:{
+    "foot-privacy":"Trang này đếm lượt xem bằng Cloudflare Web Analytics: không cookie, không fingerprint, không theo dõi xuyên site. Bản thân app không gửi gì cả.",
+    "fb4link":"Mở báo cáo riêng tư",
     "nav1":"Tính năng","nav2":"Hình ảnh","nav3":"Tải về","nav4":"Ủng hộ",
     "how-h":"⚡ Hoạt động thế nào","how-sub":"Ba bước. Config thì bạn đã có sẵn.",
     "s1t":"Import config của bạn","s1d":"Kéo vào một <span class='mono'>.conf</span>, quét QR, hoặc nhập tay. Dải IP trùng nhau và config full-tunnel thứ hai được cảnh báo ngay tại đó.",
@@ -581,7 +583,7 @@ const I18N = {
     "s3t":"Bật tất cả cùng lúc","s3d":"Mọi tunnel chạy song song, kèm kill switch fail-closed và một bài test chứng minh traffic thật sự đi đúng đường bạn khai.",
     "badge-pre":"chưa phát hành","badge-os":"macOS 15+ · Apple Silicon &amp; Intel","badge-lic":"Miễn phí · mã nguồn đóng",
     "cta-dl":"Tải cho macOS","cta-works":"Hiện tại chạy được gì",
-    "t1":"Khoá của bạn nằm trong Keychain macOS","t2":"Không cần tài khoản, không thu thập dữ liệu","t3":"Server của bạn, config của bạn",
+    "t1":"Khoá của bạn nằm trong Keychain macOS","t2":"App không cần tài khoản và không gửi dữ liệu về","t3":"Server của bạn, config của bạn",
     "rack-title":"3 tunnel đang chạy","rack-ks":"Kill switch đang bật",
     "lane1":"<b>0.0.0.0/0</b> — tất cả phần còn lại","lane2":"<b>10.20.0.0/16</b> — dịch vụ nội bộ","lane3":"<b>203.0.113.7/32</b> — một host, thắng cả full tunnel",
     "rack-note":"Prefix dài hơn thắng: route <span class='mono'>/32</span> thắng full tunnel, nên một host có thể đi ra bằng đường khác với phần còn lại.",
@@ -633,11 +635,13 @@ const I18N = {
     "fb1t":"Báo lỗi","fb1d":"Một form ngắn hỏi phiên bản, macOS của bạn, và chuyện gì đã xảy ra. Bạn mô tả càng chính xác cái routing bạn mong đợi thì sửa càng nhanh.",
     "fb2t":"Đề xuất tính năng","fb2d":"Hãy kể vấn đề bạn đang cần giải, thay vì tính năng bạn hình dung — thường sẽ ra kết quả tốt hơn.",
     "fb3t":"Đặt câu hỏi","fb3d":"Câu hỏi và nhờ hỗ trợ cài đặt đưa sang Discussions, để phần issue chỉ còn lỗi thật.",
-    "fb4t":"Báo lỗi bảo mật","fb4d":"Gửi riêng, đừng bao giờ mở issue công khai. WGSmart chạy một service quyền cao, nên báo cáo bảo mật được xử lý trước mọi thứ khác. Dùng kênh private của GitHub, hoặc <span class='mono'>wgsmart@solutions101.org</span>.",
+    "fb4t":"Báo lỗi bảo mật","fb4d":"Gửi riêng, đừng bao giờ mở issue công khai. WGSmart chạy một service quyền cao, nên báo cáo bảo mật được xử lý trước mọi thứ khác.",
     "redact-h":"Trước khi dán log hay ảnh chụp","redact-p":"Log VPN mang địa chỉ thật — endpoint server, dải mạng nội bộ, tên WiFi, có khi cả khoá. Hãy xoá chúng trước. Thứ đã đăng công khai thì không rút lại được.",
     "foot1":"WGSmart — miễn phí, mã nguồn đóng, cho macOS.","foot2":"Tải về","foot3":"Ủng hộ","foot4":"Báo lỗi"
   },
   zh:{
+    "foot-privacy":"本站使用 Cloudflare Web Analytics 统计访问量：无 Cookie、无指纹识别、不跨站追踪。应用本身不回传任何数据。",
+    "fb4link":"提交私密安全报告",
     "nav1":"功能","nav2":"界面","nav3":"下载","nav4":"支持",
     "how-h":"⚡ 工作方式","how-sub":"三步。配置你本来就有。",
     "s1t":"导入你的配置","s1d":"拖入一个 <span class='mono'>.conf</span>、扫描二维码，或手动输入。重叠的地址段和第二份全局隧道配置会当场被标出来。",
@@ -645,7 +649,7 @@ const I18N = {
     "s3t":"让它们同时连上","s3d":"所有隧道并行运行，配上故障即断网的开关，以及一项证明流量确实按你所说走的测试。",
     "badge-pre":"预发布","badge-os":"macOS 15+ · Apple Silicon 与 Intel","badge-lic":"免费 · 闭源",
     "cta-dl":"下载 macOS 版","cta-works":"目前真正可用的功能",
-    "t1":"密钥保存在 macOS 钥匙串中","t2":"无需账号，不收集数据","t3":"你自己的服务器，你自己的配置",
+    "t1":"密钥保存在 macOS 钥匙串中","t2":"应用无需账号，也不回传任何数据","t3":"你自己的服务器，你自己的配置",
     "rack-title":"3 条隧道运行中","rack-ks":"断网保护已启用",
     "lane1":"<b>0.0.0.0/0</b> — 其余全部流量","lane2":"<b>10.20.0.0/16</b> — 内部服务","lane3":"<b>203.0.113.7/32</b> — 单个主机，优先于全局隧道",
     "rack-note":"更长的前缀优先：<span class='mono'>/32</span> 路由优先于全局隧道，因此单个主机可以走与其他流量不同的出口。",
@@ -697,7 +701,7 @@ const I18N = {
     "fb1t":"报告问题","fb1d":"一份简短表单会询问你的版本、你的 macOS，以及发生了什么。你把期望的分流行为描述得越准确，修得就越快。",
     "fb2t":"请求功能","fb2d":"请描述你想解决的问题，而不是你设想的功能——这样通常会得到更好的结果。",
     "fb3t":"提问","fb3d":"提问和安装求助请发到 Discussions，让 issue 列表只留真实缺陷。",
-    "fb4t":"报告安全问题","fb4d":"请私下提交，绝不要开公开 issue。WGSmart 运行着一个特权服务，因此安全报告会优先于其他一切处理。请使用 GitHub 的私密报告渠道，或发送至 <span class='mono'>wgsmart@solutions101.org</span>。",
+    "fb4t":"报告安全问题","fb4d":"请私下提交，绝不要开公开 issue。WGSmart 运行着一个特权服务，因此安全报告会优先于其他一切处理。",
     "redact-h":"在粘贴日志或截图之前","redact-p":"VPN 诊断信息里带着真实地址——服务器端点、你的内网网段、Wi-Fi 名称，有时还有密钥。请先去掉它们。公开发出去的东西是收不回来的。",
     "foot1":"WGSmart —— 免费、闭源、面向 macOS。","foot2":"下载","foot3":"支持","foot4":"问题反馈"
   }
