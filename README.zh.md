@@ -40,7 +40,7 @@ Run and route **multiple WireGuard tunnels at once** — with per-IP control the
 <br/>
 
 <!-- Landing hero image. To swap for a real screenshot, see assets/screenshots/MANIFEST.md -->
-<img src="https://raw.githubusercontent.com/lyquyduong/WGSmart/docs/assets/ui/dashboard.svg" width="760" alt="WGSmart dashboard — multiple tunnels active at once" />
+<img src="https://raw.githubusercontent.com/lyquyduong/WGSmart/docs/assets/screenshots/dashboard.png" width="760" alt="WGSmart dashboard — multiple tunnels active at once" />
 
 </div>
 
@@ -89,7 +89,7 @@ WGSmart 是 macOS 上面向**高级用户的 WireGuard 控制台**。官方 Wire
 
 | 添加隧道 | 智能规则 | 连接测试 |
 |---|---|---|
-| ![添加隧道 — 导入 .conf，当场标记冲突](https://raw.githubusercontent.com/lyquyduong/WGSmart/docs/assets/ui/add-tunnel.svg) | ![智能规则 — 按 IP 覆盖路由](https://raw.githubusercontent.com/lyquyduong/WGSmart/docs/assets/ui/smart-rules.svg) | ![连接测试 — 隧道出口 IP vs 公网 IP](https://raw.githubusercontent.com/lyquyduong/WGSmart/docs/assets/ui/connection-test.svg) |
+| ![添加隧道 — 导入 .conf，当场标记冲突](https://raw.githubusercontent.com/lyquyduong/WGSmart/docs/assets/screenshots/tunnels.png) | ![智能规则 — 按 IP 覆盖路由](https://raw.githubusercontent.com/lyquyduong/WGSmart/docs/assets/ui/smart-rules.svg) | ![连接测试 — 隧道出口 IP vs 公网 IP](https://raw.githubusercontent.com/lyquyduong/WGSmart/docs/assets/ui/connection-test.svg) |
 
 <p align="center"><img src="https://raw.githubusercontent.com/lyquyduong/WGSmart/docs/assets/ui/menubar.svg" width="340" alt="菜单栏弹窗 — 实时状态与吞吐" /></p>
 
