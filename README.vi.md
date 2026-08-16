@@ -123,7 +123,27 @@ tunnel, và mở cổng lắng nghe. Cùng một core với daemon macOS, chạy
 > chấp nhận hỏng được, đừng thử trên máy đang có người phụ thuộc. Chúng tôi thà nói thẳng còn hơn
 > để bạn tự cho là ngược lại.
 
-**Ubuntu / Debian**
+**Ubuntu / Debian — apt (khuyến nghị)**
+
+```sh
+curl -fsSL https://wgsmart.base101.app/apt/wgsmart.gpg \
+  | sudo tee /usr/share/keyrings/wgsmart.gpg >/dev/null
+echo "deb [signed-by=/usr/share/keyrings/wgsmart.gpg] https://wgsmart.base101.app/apt stable main" \
+  | sudo tee /etc/apt/sources.list.d/wgsmart.list
+sudo apt update && sudo apt install wgsmart-hub
+```
+
+Từ đó nâng cấp bằng `apt upgrade` như mọi gói khác. Gói tự kéo `iproute2` và `nftables`, cài
+systemd unit, và **enable nhưng không start** service — vì chưa có config. Đặt config của hub vào
+rồi mới khởi động:
+
+```sh
+sudo install -m 0600 wg0.conf /etc/wgsmart/wg0.conf
+sudo systemctl start wgsmart-hub && systemctl status wgsmart-hub
+```
+
+**Cài thủ công (mọi distro)**
+
 
 ```sh
 sudo apt-get install -y iproute2 nftables

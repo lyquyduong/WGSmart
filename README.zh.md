@@ -122,7 +122,26 @@ WGSmart **尚未通过 Apple 公证**。公证需要付费的 Apple Developer �
 > cgroup 调用都只被单元测试覆盖过。请在一台坏了也无所谓的服务器上试，不要用在别人依赖的机器上。
 > 我们宁愿把这句话说明白，也不愿让你误以为相反。
 
-**Ubuntu / Debian**
+**Ubuntu / Debian —— apt（推荐）**
+
+```sh
+curl -fsSL https://wgsmart.base101.app/apt/wgsmart.gpg \
+  | sudo tee /usr/share/keyrings/wgsmart.gpg >/dev/null
+echo "deb [signed-by=/usr/share/keyrings/wgsmart.gpg] https://wgsmart.base101.app/apt stable main" \
+  | sudo tee /etc/apt/sources.list.d/wgsmart.list
+sudo apt update && sudo apt install wgsmart-hub
+```
+
+之后用 `apt upgrade` 升级即可。软件包会自动拉取 `iproute2` 与 `nftables`，安装 systemd 单元，并
+**只启用、不启动**服务 —— 因为此时还没有配置。放好集线器配置再启动：
+
+```sh
+sudo install -m 0600 wg0.conf /etc/wgsmart/wg0.conf
+sudo systemctl start wgsmart-hub && systemctl status wgsmart-hub
+```
+
+**手动安装（任意发行版）**
+
 
 ```sh
 sudo apt-get install -y iproute2 nftables

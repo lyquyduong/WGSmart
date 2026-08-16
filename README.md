@@ -123,7 +123,27 @@ tunnel subnet, and opens the listen port. Same core as the macOS daemon, under s
 > you can afford to break, not on one people depend on. We would rather say this than have you
 > assume otherwise.
 
-**Ubuntu / Debian**
+**Ubuntu / Debian — apt (recommended)**
+
+```sh
+curl -fsSL https://wgsmart.base101.app/apt/wgsmart.gpg \
+  | sudo tee /usr/share/keyrings/wgsmart.gpg >/dev/null
+echo "deb [signed-by=/usr/share/keyrings/wgsmart.gpg] https://wgsmart.base101.app/apt stable main" \
+  | sudo tee /etc/apt/sources.list.d/wgsmart.list
+sudo apt update && sudo apt install wgsmart-hub
+```
+
+Upgrades then arrive with `apt upgrade` like anything else. The package pulls in `iproute2` and
+`nftables`, installs the systemd unit, and **enables but does not start** the service — it has no
+config yet. Drop your hub config in and start it:
+
+```sh
+sudo install -m 0600 wg0.conf /etc/wgsmart/wg0.conf
+sudo systemctl start wgsmart-hub && systemctl status wgsmart-hub
+```
+
+**Manual install (any distro)**
+
 
 ```sh
 sudo apt-get install -y iproute2 nftables
