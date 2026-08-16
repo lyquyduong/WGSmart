@@ -1,0 +1,23 @@
+Origin: WGSmart
+Label: WGSmart
+Suite: stable
+Codename: stable
+Architectures: amd64 arm64
+Components: main
+Description: WGSmart apt repository
+Date: Sun, 16 Aug 2026 09:07:29 +0000
+MD5Sum:
+ 119a7383e538d1eb9bce1906ff435c24              842 main/binary-amd64/Packages
+ 1562b23e4ce2372a35a56adf3070f92f              572 main/binary-amd64/Packages.gz
+ 25adddf41e44361681b90930321ada85              841 main/binary-arm64/Packages
+ cfa3d53a91a98e8cd7d29f606912edc1              574 main/binary-arm64/Packages.gz
+SHA1:
+ 06ed36945bbb797a7acaad9de7c1fbbebaf46b6c              842 main/binary-amd64/Packages
+ d62219d33431018ed85d7428e5f9e3e9f69254f0              572 main/binary-amd64/Packages.gz
+ da9982a7b140d5e8f293ad8d1b9a5249899b694c              841 main/binary-arm64/Packages
+ fbcb9eb1067d5fcabb42946448f92b56f4faff8e              574 main/binary-arm64/Packages.gz
+SHA256:
+ 8fe6507f2b7fc35709364ca7e0123ba0980be95766028cb29f7b5be140b0c1ae              842 main/binary-amd64/Packages
+ 66ded5c62be2dec5ce44652751888b3fd43b0012638d7d51896d808a6fb0594c              572 main/binary-amd64/Packages.gz
+ 86c91ee28e13d1dee9da4399318601d331d539b65d7a4ebd3b0ddf6c805756a7              841 main/binary-arm64/Packages
+ b700e29430428424eaa821bfdc12bf7d3ab1b82ff706217875a50ee07c884606              574 main/binary-arm64/Packages.gz
