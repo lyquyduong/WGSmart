@@ -83,7 +83,8 @@ Written, tested in isolation, and shipping in the build — but not yet run long
 - 🧭 **DNS routing** — A local resolver that watches answers to pin routes more accurately. Present but **switched off by default**, because a resolver that misbehaves takes the whole machine's DNS with it.
 - 📊 **Notification Center widget** — Tunnel status at a glance. **Read-only** — it shows state, it does not toggle tunnels.
 - 📶 **Smart rules by Wi-Fi** — Auto-connect on untrusted networks, stand down on trusted SSIDs.
-- 🖥️ **Linux and Windows** — The engine cross-compiles and its tests pass for both, and a headless Linux service with a browser UI exists. Neither has been run against a real kernel, so neither is offered as a download.
+- 🐧 **Linux server hub** — A headless service with a browser UI, and **as of 1.0.2 it is downloadable** (signed, amd64 and arm64). It cross-compiles and its tests pass, but **it has not yet been run in production** — every `nft`, `ip` and cgroup call in it is exercised only by unit tests. See [Linux install](#linux-hub).
+- 🪟 **Windows** — The engine compiles and its tests pass, and nothing more. There is no Windows app, routing by user and by port have no equivalent mechanism there yet, and it is **not offered as a download**.
 
 ### 🖼️ Screenshots
 
@@ -108,6 +109,59 @@ WGSmart is **not yet notarized by Apple**. Notarization needs a paid Apple Devel
 To open it anyway: right-click the app ▸ **Open**, then confirm once. You should not need to repeat it for later updates.
 
 If that is not a trade you want to make for a tool that runs with system privileges, that is a completely reasonable call — wait for the notarized build. It is the next thing being funded, and the goal is in the Support section below.
+
+<a id="linux-hub"></a>
+
+### 🐧 Linux server hub (Ubuntu, Debian, RHEL)
+
+A different product from the Mac app: no GUI, no client. It turns a **server** into a WireGuard
+hub — creates the TUN device, enables IPv4 forwarding, installs an nftables masquerade for the
+tunnel subnet, and opens the listen port. Same core as the macOS daemon, under systemd.
+
+> ⚠️ **This build has not been run in production by the author.** It cross-compiles and its tests
+> pass; every `nft`, `ip` and cgroup call in it is covered only by unit tests. Try it on a server
+> you can afford to break, not on one people depend on. We would rather say this than have you
+> assume otherwise.
+
+**Ubuntu / Debian**
+
+```sh
+sudo apt-get install -y iproute2 nftables
+
+# Resolves the newest release, so this snippet never goes stale.
+VER=$(curl -fsSI https://github.com/lyquyduong/WGSmart/releases/latest \
+      | awk -F'/v' 'tolower($0) ~ /^location:/{print $2}' | tr -d '\r\n')
+ARCH=$(uname -m); case "$ARCH" in x86_64) ARCH=amd64;; aarch64|arm64) ARCH=arm64;; esac
+BASE="wgsmart-hub-${VER}-linux-${ARCH}.tar.gz"
+URL="https://github.com/lyquyduong/WGSmart/releases/download/v${VER}"
+
+curl -fLO "${URL}/${BASE}" && curl -fLO "${URL}/${BASE}.sha256"
+sha256sum -c "${BASE}.sha256"          # must print: OK
+
+tar xzf "$BASE"
+sudo "wgsmart-hub-${VER}-linux-${ARCH}/install.sh"
+```
+
+On **RHEL / Fedora / Rocky** the only difference is the first line:
+`sudo dnf install -y iproute nftables`.
+
+That installs the binary to `/usr/local/bin/wgsmart-hub`, drops a systemd unit, creates
+`/etc/wgsmart`, then enables and starts the service. Re-running it upgrades in place.
+
+```sh
+systemctl status wgsmart-hub
+journalctl -u wgsmart-hub -f
+```
+
+Then export the hub's `.conf` from the Mac app's **Config Studio** and place it at
+`/etc/wgsmart/wg0.conf` with mode `0600` — it contains the hub's private key.
+
+Every tarball carries a full install guide in **English, Tiếng Việt and 中文**
+(`INSTALL.md` · `INSTALL.vi.md` · `INSTALL.zh.md`), including the Ed25519 signature check, remote
+management over TLS, uninstall, and troubleshooting.
+
+> **Requirements:** Linux with systemd · `iproute2` and `nftables` on `PATH` · root.
+> Uninstall with `sudo <dir>/uninstall.sh` (add `--purge` to drop config and state too).
 
 #### Verify what you downloaded
 

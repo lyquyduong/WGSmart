@@ -83,7 +83,8 @@ Chính người viết dùng mỗi ngày trên macOS.
 - 🧭 **Route theo DNS** — Một resolver cục bộ quan sát câu trả lời để ghim route chính xác hơn. Có sẵn nhưng **mặc định tắt**, vì resolver chạy sai sẽ kéo theo DNS của cả máy.
 - 📊 **Widget Notification Center** — Trạng thái tunnel nhìn là biết. **Chỉ đọc** — nó hiện trạng thái, không bật tắt tunnel.
 - 📶 **Smart rules theo Wi-Fi** — Tự kết nối ở mạng không tin cậy, tự đứng xuống ở SSID tin cậy.
-- 🖥️ **Linux và Windows** — Engine cross-compile được và test đạt cho cả hai, và đã có service Linux headless kèm UI trên browser. Cả hai chưa chạy với kernel thật, nên chưa cái nào được đưa ra tải.
+- 🐧 **Hub máy chủ Linux** — Service headless kèm UI trên browser, và **từ bản 1.0.2 đã có thể tải về** (đã ký, amd64 và arm64). Nó cross-compile được và test đạt, nhưng **chưa từng chạy trong môi trường thật** — mọi lệnh `nft`, `ip` và cgroup trong đó mới chỉ được unit test chạm tới. Xem [phần cài Linux](#linux-hub).
+- 🪟 **Windows** — Engine biên dịch được và test đạt, chỉ vậy thôi. Chưa có app Windows, định tuyến theo user và theo port chưa có cơ chế tương đương ở đó, và **chưa được đưa ra tải**.
 
 ### 🖼️ Ảnh chụp
 
@@ -108,6 +109,59 @@ WGSmart **chưa được Apple notarize**. Notarize cần tài khoản Apple Dev
 Để vẫn mở: bấm chuột phải vào app ▸ **Open**, rồi xác nhận một lần. Các bản cập nhật sau sẽ không cần làm lại.
 
 Nếu bạn thấy đó không phải đánh đổi đáng làm cho một công cụ chạy với quyền hệ thống, thì đó là quyết định hoàn toàn hợp lý — hãy chờ bản đã notarize. Đó là mục được ưu tiên gây quỹ, mục tiêu nằm ở phần Ủng hộ bên dưới.
+
+<a id="linux-hub"></a>
+
+### 🐧 Hub máy chủ Linux (Ubuntu, Debian, RHEL)
+
+Đây là một sản phẩm khác với app Mac: không GUI, không phải client. Nó biến một **máy chủ** thành
+WireGuard hub — tạo thiết bị TUN, bật IPv4 forwarding, cài masquerade nftables cho dải mạng của
+tunnel, và mở cổng lắng nghe. Cùng một core với daemon macOS, chạy dưới systemd.
+
+> ⚠️ **Bản này tác giả chưa từng chạy trong môi trường thật.** Nó cross-compile được và test đạt;
+> mọi lệnh `nft`, `ip` và cgroup trong đó mới chỉ được unit test chạm tới. Hãy thử trên máy chủ bạn
+> chấp nhận hỏng được, đừng thử trên máy đang có người phụ thuộc. Chúng tôi thà nói thẳng còn hơn
+> để bạn tự cho là ngược lại.
+
+**Ubuntu / Debian**
+
+```sh
+sudo apt-get install -y iproute2 nftables
+
+# Resolves the newest release, so this snippet never goes stale.
+VER=$(curl -fsSI https://github.com/lyquyduong/WGSmart/releases/latest \
+      | awk -F'/v' 'tolower($0) ~ /^location:/{print $2}' | tr -d '\r\n')
+ARCH=$(uname -m); case "$ARCH" in x86_64) ARCH=amd64;; aarch64|arm64) ARCH=arm64;; esac
+BASE="wgsmart-hub-${VER}-linux-${ARCH}.tar.gz"
+URL="https://github.com/lyquyduong/WGSmart/releases/download/v${VER}"
+
+curl -fLO "${URL}/${BASE}" && curl -fLO "${URL}/${BASE}.sha256"
+sha256sum -c "${BASE}.sha256"          # phải in ra: OK
+
+tar xzf "$BASE"
+sudo "wgsmart-hub-${VER}-linux-${ARCH}/install.sh"
+```
+
+Trên **RHEL / Fedora / Rocky** chỉ khác đúng dòng đầu:
+`sudo dnf install -y iproute nftables`.
+
+Lệnh trên đặt binary vào `/usr/local/bin/wgsmart-hub`, cài systemd unit, tạo `/etc/wgsmart`, rồi
+enable và khởi động service. Chạy lại chính nó để nâng cấp tại chỗ.
+
+```sh
+systemctl status wgsmart-hub
+journalctl -u wgsmart-hub -f
+```
+
+Sau đó export file `.conf` của hub từ **Config Studio** trong app Mac và đặt vào
+`/etc/wgsmart/wg0.conf` với quyền `0600` — file này chứa khoá riêng của hub.
+
+Mỗi tarball đều mang theo hướng dẫn cài đầy đủ bằng **tiếng Anh, tiếng Việt và tiếng Trung**
+(`INSTALL.md` · `INSTALL.vi.md` · `INSTALL.zh.md`), gồm cả cách kiểm chữ ký Ed25519, quản lý từ xa
+qua TLS, gỡ cài đặt và xử lý sự cố.
+
+> **Yêu cầu:** Linux có systemd · `iproute2` và `nftables` trong `PATH` · quyền root.
+> Gỡ bằng `sudo <thư-mục>/uninstall.sh` (thêm `--purge` để xoá cả config và state).
 
 #### Kiểm tra file bạn vừa tải
 
