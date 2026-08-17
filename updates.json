@@ -14,6 +14,24 @@
           "signature": "jk/+LgyXf8BvetHJr6MeHNcZprwmnUrbeJ37nO5U++YneUtjfEADuPX+Y9sJBb14Rc4+hWPbNRo1OqG/UFIXBQ==",
           "size": 21472423,
           "url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.3/WGSmart-1.0.3.pkg"
+        },
+        "linux-amd64": {
+          "filename": "wgsmart-hub-1.0.3-linux-amd64.tar.gz",
+          "install": "tarball",
+          "minisig_url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.3/wgsmart-hub-1.0.3-linux-amd64.tar.gz.sig",
+          "sha256": "becd2247acdc9d9a05006051a1ecd08443540bacd4988a603b4915cf7c213a68",
+          "signature": "ApSxfpNC0iYasGxRND0+Em+qRbvvQoNA9FozEs0IjsU6V8nfHcEXxFSLAZUQCqx9mLXVnBGkgCuqhweKGZ0ADA==",
+          "size": 9990053,
+          "url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.3/wgsmart-hub-1.0.3-linux-amd64.tar.gz"
+        },
+        "linux-arm64": {
+          "filename": "wgsmart-hub-1.0.3-linux-arm64.tar.gz",
+          "install": "tarball",
+          "minisig_url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.3/wgsmart-hub-1.0.3-linux-arm64.tar.gz.sig",
+          "sha256": "c1b04fe16999153d64c610f39cfc27facec3ab3d992de7321489085b8fbd0b7a",
+          "signature": "NQBT4Zni+j0gsv3y1J9t/3XtMxuR0nGJPl3ajShLdv8BI7IOIgjMfOrn5tyo9atCh3K611Xo0EXBwm3wFQa8DA==",
+          "size": 9007293,
+          "url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.3/wgsmart-hub-1.0.3-linux-arm64.tar.gz"
         }
       },
       "pub_date": "2026-08-17T06:03:08Z",
@@ -25,6 +43,6 @@
       "version": "1.0.3"
     }
   },
-  "generated": "2026-08-17T06:03:08Z",
+  "generated": "2026-08-17T07:20:02Z",
   "schema": 1
 }
