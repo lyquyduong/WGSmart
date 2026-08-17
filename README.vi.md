@@ -83,7 +83,7 @@ Chính người viết dùng mỗi ngày trên macOS.
 - 🧭 **Route theo DNS** — Một resolver cục bộ quan sát câu trả lời để ghim route chính xác hơn. Có sẵn nhưng **mặc định tắt**, vì resolver chạy sai sẽ kéo theo DNS của cả máy.
 - 📊 **Widget Notification Center** — Trạng thái tunnel nhìn là biết. **Chỉ đọc** — nó hiện trạng thái, không bật tắt tunnel.
 - 📶 **Smart rules theo Wi-Fi** — Tự kết nối ở mạng không tin cậy, tự đứng xuống ở SSID tin cậy.
-- 🐧 **Hub máy chủ Linux** — Service headless kèm UI trên browser, và **từ bản 1.0.2 đã có thể tải về** (đã ký, amd64 và arm64). Nó cross-compile được và test đạt, nhưng **chưa từng chạy trong môi trường thật** — mọi lệnh `nft`, `ip` và cgroup trong đó mới chỉ được unit test chạm tới. Xem [phần cài Linux](#linux-hub).
+- 🐧 **Hub máy chủ Linux** — Service headless kèm UI trên browser, cài được bằng một dòng lệnh (đã ký, amd64 và arm64). **Từ bản 1.0.3**, phần đóng gói đã được kiểm chứng đầu-cuối — cài từ apt và từ tarball trên một hệ systemd thật, service khởi động, đã đăng nhập được vào UI. Thứ **vẫn chưa được chứng minh là bản thân phần VPN**: mọi lệnh `nft`, `ip` và cgroup mới chỉ được unit test chạm tới, và chưa có tunnel nào tải lưu lượng trên phần cứng thật. Xem [phần cài Linux](#linux-hub).
 - 🪟 **Windows** — Engine biên dịch được và test đạt, chỉ vậy thôi. Chưa có app Windows, định tuyến theo user và theo port chưa có cơ chế tương đương ở đó, và **chưa được đưa ra tải**.
 
 ### 🖼️ Ảnh chụp
@@ -123,7 +123,38 @@ tunnel, và mở cổng lắng nghe. Cùng một core với daemon macOS, chạy
 > chấp nhận hỏng được, đừng thử trên máy đang có người phụ thuộc. Chúng tôi thà nói thẳng còn hơn
 > để bạn tự cho là ngược lại.
 
-**Ubuntu / Debian — apt (khuyến nghị)**
+**Một dòng, mọi distro**
+
+```sh
+curl -fsSL https://wgsmart.base101.app/installer.sh | sh
+```
+
+Thêm `sh -s -- --with-web` để bật luôn giao diện web, hoặc `--dry-run` để xem nó sẽ làm gì mà
+không thay đổi gì cả.
+
+Nó tự chọn đúng đường cho máy bạn và nói rõ đã chọn đường nào:
+
+| Hệ của bạn | Nó làm gì | Ai xác minh bản tải |
+|---|---|---|
+| Debian, Ubuntu và các bản dẫn xuất | Cấu hình kho APT rồi `apt install` | **GPG**, và tiếp tục xác minh ở mọi lần `apt upgrade` sau này |
+| Còn lại | Tải tarball đã ký, theo đúng tên ghi trong manifest đã ký | **Ed25519**, kiểm trước khi giải nén bất cứ thứ gì |
+
+Nếu không xác minh được, nó **dừng** chứ không cài liều. (Đường tarball cần OpenSSL 3.x để kiểm
+Ed25519 — OpenSSL 1.1.1 hoàn toàn không làm được việc này qua dòng lệnh. Những hệ cũ tới mức đó
+gần như luôn là Debian hoặc Ubuntu, vốn đi đường apt nên không bị ảnh hưởng.)
+
+**Đọc trước khi chạy vẫn là thói quen tốt hơn** — nó cài một service chạy quyền root, và bạn không
+nên phải tin lời chúng tôi về chuyện nó làm gì:
+
+```sh
+curl -fsSL https://wgsmart.base101.app/installer.sh -o installer.sh
+less installer.sh && sh installer.sh
+```
+
+<details>
+<summary><b>Muốn tự tay làm? — apt, từng bước</b></summary>
+
+Đúng những gì installer làm trên một hệ Debian-family:
 
 ```sh
 curl -fsSL https://wgsmart.base101.app/apt/wgsmart.gpg \
@@ -132,6 +163,8 @@ echo "deb [signed-by=/usr/share/keyrings/wgsmart.gpg] https://wgsmart.base101.ap
   | sudo tee /etc/apt/sources.list.d/wgsmart.list
 sudo apt update && sudo apt install wgsmart-hub
 ```
+
+</details>
 
 Từ đó nâng cấp bằng `apt upgrade` như mọi gói khác. Gói tự kéo `iproute2` và `nftables`, cài
 systemd unit, và **enable nhưng không start** service — vì chưa có config. Đặt config của hub vào
@@ -142,8 +175,8 @@ sudo install -m 0600 wg0.conf /etc/wgsmart/wg0.conf
 sudo systemctl start wgsmart-hub && systemctl status wgsmart-hub
 ```
 
-**Cài thủ công (mọi distro)**
-
+<details>
+<summary><b>Muốn tự tay làm? — tarball, từng bước</b></summary>
 
 ```sh
 sudo apt-get install -y iproute2 nftables
@@ -165,13 +198,34 @@ sudo "wgsmart-hub-${VER}-linux-${ARCH}/install.sh"
 Trên **RHEL / Fedora / Rocky** chỉ khác đúng dòng đầu:
 `sudo dnf install -y iproute nftables`.
 
-Lệnh trên đặt binary vào `/usr/local/bin/wgsmart-hub`, cài systemd unit, tạo `/etc/wgsmart`, rồi
-enable và khởi động service. Chạy lại chính nó để nâng cấp tại chỗ.
+Lệnh trên đặt binary vào `/usr/bin/wgsmart-hub`, cài systemd unit, tạo `/etc/wgsmart`, rồi enable
+và khởi động service. Chạy lại chính nó để nâng cấp tại chỗ, kể cả giao diện web nếu bạn đã bật.
+
+</details>
 
 ```sh
 systemctl status wgsmart-hub
 journalctl -u wgsmart-hub -f
 ```
+
+#### Giao diện web
+
+Quản trị hub bằng trình duyệt thay vì app Mac — một trang nhúng sẵn, không CDN, không bước build.
+
+```sh
+sudo wgsmart-webui-enable      # cài bằng apt
+sudo ./install.sh --with-web   # cài bằng tarball
+```
+
+Nó **tắt cho tới khi bạn bật**, chỉ nghe loopback, và chạy dưới tài khoản không đặc quyền — đây là
+một form đăng nhập HTTP đặt trước một service chạy root, nên không thứ nào trong đó được bật tự
+động. Vào bằng SSH tunnel (`ssh -N -L 8080:127.0.0.1:8080 you@server`) hoặc đặt TLS proxy phía
+trước; `WEBUI.md` trong tarball và tại `/usr/share/doc/wgsmart-hub/` hướng dẫn cả hai, bằng cả ba
+thứ tiếng.
+
+Trên cùng một máy, nó nói chuyện với hub qua Unix socket **không cần chứng chỉ nào** — socket để
+`0600` và mọi kết nối đều bị kiểm bằng `SO_PEERCRED`, tức chính kernel bảo chứng tiến trình bên kia
+là ai. Quản trị hub nằm trên **máy khác** thì dùng TLS 1.3 kèm mutual TLS và/hoặc bearer token.
 
 Sau đó export file `.conf` của hub từ **Config Studio** trong app Mac và đặt vào
 `/etc/wgsmart/wg0.conf` với quyền `0600` — file này chứa khoá riêng của hub.

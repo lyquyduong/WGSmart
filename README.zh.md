@@ -83,7 +83,7 @@ WGSmart 是 macOS 上面向**高级用户的 WireGuard 控制台**。官方 Wire
 - 🧭 **按 DNS 分流** — 一个本地解析器，通过观察应答来更准确地钉住路由。已经内置但**默认关闭**，因为解析器一旦出错，整台机器的 DNS 都会跟着出问题。
 - 📊 **通知中心小组件** — 一眼看到隧道状态。**只读** —— 它显示状态，不切换隧道。
 - 📶 **按 Wi-Fi 的智能规则** — 在不可信网络自动连接，在可信 SSID 上自动停用。
-- 🐧 **Linux 服务端集线器** — 无界面服务，配浏览器 UI，**自 1.0.2 起已可下载**（已签名，amd64 与 arm64）。它能交叉编译且测试通过，但**尚未在生产环境中运行过** —— 其中每一处 `nft`、`ip` 和 cgroup 调用都只被单元测试覆盖过。见 [Linux 安装](#linux-hub)。
+- 🐧 **Linux 服务端集线器** — 无界面服务，配浏览器 UI，一行命令即可安装（已签名，amd64 与 arm64）。**自 1.0.3 起**，打包部分已端到端验证过 —— 在真实的 systemd 系统上分别从 apt 和 tarball 安装、服务已启动、浏览器界面已登录成功。**仍未被证明的是 VPN 本身**：其中每一处 `nft`、`ip` 和 cgroup 调用都只被单元测试覆盖过，还没有任何隧道在真实硬件上承载过流量。见 [Linux 安装](#linux-hub)。
 - 🪟 **Windows** — 引擎能编译、测试通过，仅此而已。没有 Windows 应用，按用户和按端口分流在那里还没有对应机制，**也不提供下载**。
 
 ### 🖼️ 截图
@@ -122,7 +122,35 @@ WGSmart **尚未通过 Apple 公证**。公证需要付费的 Apple Developer �
 > cgroup 调用都只被单元测试覆盖过。请在一台坏了也无所谓的服务器上试，不要用在别人依赖的机器上。
 > 我们宁愿把这句话说明白，也不愿让你误以为相反。
 
-**Ubuntu / Debian —— apt（推荐）**
+**一行命令，任意发行版**
+
+```sh
+curl -fsSL https://wgsmart.base101.app/installer.sh | sh
+```
+
+加上 `sh -s -- --with-web` 可同时启用浏览器界面；加 `--dry-run` 则只显示它会做什么，不改动任何东西。
+
+它会为你的系统选择正确的路径，并明确告诉你选了哪条：
+
+| 你的系统 | 它做什么 | 由谁校验下载内容 |
+|---|---|---|
+| Debian、Ubuntu 及其衍生版 | 配置 APT 仓库，然后 `apt install` | **GPG**，而且此后每次 `apt upgrade` 都会继续校验 |
+| 其余系统 | 按已签名的更新清单所指，下载已签名的 tarball | **Ed25519**，在解压任何文件之前完成校验 |
+
+若无法校验，它会**停止**，而不是照装不误。（tarball 路径需要 OpenSSL 3.x 才能校验 Ed25519 ——
+OpenSSL 1.1.1 在命令行上根本做不到。那么旧的系统几乎都是 Debian 或 Ubuntu，它们走 apt 路径，不受影响。）
+
+**先读一遍再运行仍是更好的习惯** —— 它安装的是以 root 运行的服务，你不该只凭我们一句话就相信它做了什么：
+
+```sh
+curl -fsSL https://wgsmart.base101.app/installer.sh -o installer.sh
+less installer.sh && sh installer.sh
+```
+
+<details>
+<summary><b>想自己动手？—— apt，分步骤</b></summary>
+
+这正是安装脚本在 Debian 系系统上所做的事：
 
 ```sh
 curl -fsSL https://wgsmart.base101.app/apt/wgsmart.gpg \
@@ -132,6 +160,8 @@ echo "deb [signed-by=/usr/share/keyrings/wgsmart.gpg] https://wgsmart.base101.ap
 sudo apt update && sudo apt install wgsmart-hub
 ```
 
+</details>
+
 之后用 `apt upgrade` 升级即可。软件包会自动拉取 `iproute2` 与 `nftables`，安装 systemd 单元，并
 **只启用、不启动**服务 —— 因为此时还没有配置。放好集线器配置再启动：
 
@@ -140,8 +170,8 @@ sudo install -m 0600 wg0.conf /etc/wgsmart/wg0.conf
 sudo systemctl start wgsmart-hub && systemctl status wgsmart-hub
 ```
 
-**手动安装（任意发行版）**
-
+<details>
+<summary><b>想自己动手？—— tarball，分步骤</b></summary>
 
 ```sh
 sudo apt-get install -y iproute2 nftables
@@ -163,13 +193,33 @@ sudo "wgsmart-hub-${VER}-linux-${ARCH}/install.sh"
 在 **RHEL / Fedora / Rocky** 上，只有第一行不同：
 `sudo dnf install -y iproute nftables`。
 
-它会把可执行文件装到 `/usr/local/bin/wgsmart-hub`，放置 systemd 单元，创建 `/etc/wgsmart`，然后
-启用并启动服务。重复执行即为原地升级。
+它会把可执行文件装到 `/usr/bin/wgsmart-hub`，放置 systemd 单元，创建 `/etc/wgsmart`，然后启用并
+启动服务。重复执行即为原地升级，若你已启用浏览器界面，它也会一并升级。
+
+</details>
 
 ```sh
 systemctl status wgsmart-hub
 journalctl -u wgsmart-hub -f
 ```
+
+#### 浏览器界面
+
+用浏览器管理集线器，而不必依赖 Mac 应用 —— 一个内嵌页面，没有 CDN，没有构建步骤。
+
+```sh
+sudo wgsmart-webui-enable      # 通过 apt 安装时
+sudo ./install.sh --with-web   # 通过 tarball 安装时
+```
+
+它**在你启用之前一直是关闭的**，只监听回环地址，并以非特权账户运行 —— 这是摆在 root 服务前面的一个
+HTTP 登录界面，所以其中没有任何一项是自动开启的。通过 SSH 隧道访问
+（`ssh -N -L 8080:127.0.0.1:8080 you@server`），或在前面架一层 TLS 代理；tarball 中以及
+`/usr/share/doc/wgsmart-hub/` 下的 `WEBUI.md` 用三种语言讲清了这两种做法。
+
+在同一台机器上，它通过 Unix 套接字与集线器通信，**完全不需要证书** —— 套接字权限为 `0600`，每个连接
+都经过 `SO_PEERCRED` 校验，由内核担保对端究竟是哪个进程。管理**另一台机器**上的集线器则使用 TLS 1.3
+配合双向 TLS 和/或 bearer 令牌。
 
 随后在 Mac 应用的 **Config Studio** 里导出集线器的 `.conf`，放到 `/etc/wgsmart/wg0.conf`，权限设
 为 `0600` —— 该文件含有集线器的私钥。
