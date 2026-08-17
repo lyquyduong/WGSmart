@@ -1,30 +1,30 @@
 {
   "channels": {
     "stable": {
-      "build": 1000002,
+      "build": 1000003,
       "critical": false,
       "notes": "",
       "platforms": {
         "darwin-universal": {
-          "filename": "WGSmart-1.0.2.pkg",
+          "filename": "WGSmart-1.0.3.pkg",
           "install": "pkg",
           "minimum_os": "15.0",
-          "minisig_url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.2/WGSmart-1.0.2.pkg.sig",
-          "sha256": "39702270221cff8cf72387ecbc722f96a3bf35a064d4c2e9ce84c5e0e4cdcb74",
-          "signature": "rFUNPFzid9v1KwSvAtsu36XraK82JqhfMb4Lh05h4Usj561tNxRJB2254AqIrIa/oUruzB4sLZy3e72WTGn2Ag==",
-          "size": 21440657,
-          "url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.2/WGSmart-1.0.2.pkg"
+          "minisig_url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.3/WGSmart-1.0.3.pkg.sig",
+          "sha256": "756ef035f28f4d3f6285ea9e1013e066244238249da4f0cf5624d90119eac93a",
+          "signature": "sjd3lYtGW97NDbmYroiqJQEtPRghg+3kpKG3mAkDLhEMQj44shLUm3HZUred4wdj4cAesIJZ0GIm0SXtsfDrDw==",
+          "size": 21469133,
+          "url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.3/WGSmart-1.0.3.pkg"
         }
       },
-      "pub_date": "2026-08-16T08:18:25Z",
-      "release_notes_url": "https://github.com/lyquyduong/WGSmart/releases/tag/v1.0.2",
+      "pub_date": "2026-08-17T05:27:48Z",
+      "release_notes_url": "https://github.com/lyquyduong/WGSmart/releases/tag/v1.0.3",
       "rollout": {
         "groups": 7,
         "interval_seconds": 86400
       },
-      "version": "1.0.2"
+      "version": "1.0.3"
     }
   },
-  "generated": "2026-08-16T08:18:25Z",
+  "generated": "2026-08-17T05:27:49Z",
   "schema": 1
 }
