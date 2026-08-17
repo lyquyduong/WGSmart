@@ -3,20 +3,20 @@
     "stable": {
       "build": 1000003,
       "critical": false,
-      "notes": "",
+      "notes": "## What's new\n\n**Updating no longer makes the app disappear.** Pressing the install button used to hand the\npackage to Installer.app and leave the sheet frozen \u2014 the button said \"Install & Relaunch\" and\ndelivered neither. Now the app installs the update, waits until the new version is genuinely on\ndisk, and offers a **Relaunch Now** button so the restart happens when you are ready. If the\nprivileged service is not responding it says so and gives you a working fallback instead of a\ndead end.\n\n**\"What's New\" is populated again.** 1.0.2 shipped with an empty panel: the release notes were\nwritten to GitHub but never inlined into the update manifest. The release tooling now fails\nloudly rather than shipping a blank changelog.\n\n---\n\n## \ud83d\udd12 The update manifest is now signed\n\n`updates.json` was the one unsigned link in the update chain. The installer package was signed\nand verified, but the document that says *which* package to install was trusted on HTTPS alone.\n\nIt now carries an Ed25519 signature, verified against the same key compiled into the app. The\nfilename is part of the signed digest, so a package signature cannot be replayed as a manifest\nsignature.\n\nIf the signature is missing or does not verify, updates still work exactly as before \u2014 discovery\nis unaffected, because the package signature was always the real gate. What an unsigned manifest\nloses is *authority*: WGSmart 1.0.3 can mark a release as required, and it will only honour that\ninstruction from a manifest it has authenticated. That ordering is deliberate \u2014 an unauthenticated\ndocument must never be able to disable anyone's software.\n\nNothing in this release is marked required.\n\n---\n\n## \ud83d\udc27 Linux\n\n**Fixed: the apt package could not start.** The `.deb` installed the binary to `/usr/bin` while\nthe systemd unit it shipped pointed at `/usr/local/bin`, so `systemctl start wgsmart-hub` failed\nwith `status=203/EXEC`. This affected every 1.0.2 apt install. Both paths are now `/usr/bin`, and\nupgrading removes the stale copy. If you installed 1.0.2 via apt, this is the fix you need.\n\n**The browser UI now ships.** `wgsmart-webbff` was written but never packaged \u2014 enabling it meant\na Go toolchain and hand-written systemd units. It is now in both the tarball and the `.deb`.\n\n```sh\nsudo wgsmart-webui-enable          # apt\nsudo ./install.sh --with-web       # tarball\n```\n\nIt is **off until you turn it on**, binds loopback only, and runs as an unprivileged account \u2014\nit is an HTTP login in front of a root daemon, so none of that is automatic. Reach it over an\nSSH tunnel, or put a TLS proxy in front; `WEBUI.md` covers both, in English, Ti\u1ebfng Vi\u1ec7t and \u4e2d\u6587.\n\nOn the same machine it talks to the hub over its Unix socket with no certificates at all. That is\nstronger than a token, not weaker: the socket is `0600` and every connection is checked with\n`SO_PEERCRED`, so the kernel attests the caller's uid. Managing a hub on a *different* machine\nstill uses TLS 1.3 with mutual TLS and/or a bearer token.\n\n**Smaller downloads.** Linux binaries are built with symbols stripped \u2014 about 31% off each. Even\nwith the web UI added, the `.deb` is smaller than 1.0.2's hub-only package.\n\n---\n\n## Still true, and worth repeating\n\n- **Not notarized.** macOS will warn on first launch. The warning is accurate: this build is\n  ad-hoc signed, not Developer ID signed. Right-click \u25b8 Open, or clear the quarantine attribute.\n- **App routing on macOS is per-UID**, not per-process. It routes everything a given user runs,\n  which is the honest description of what the mechanism does.\n- **The Linux hub is young.** It builds and its tests pass, and the packaging bugs above are the\n  kind that only surface on a real machine. Read the install guide before putting it on a server\n  that matters.\n- Windows is not supported.\n\n## Verifying this download\n\n```sh\nshasum -a 256 -c WGSmart-1.0.3.pkg.sha256\n```\n\nThe `.sig` files are Ed25519 signatures over the same artifacts; the app checks them\nautomatically on every update.",
       "platforms": {
         "darwin-universal": {
           "filename": "WGSmart-1.0.3.pkg",
           "install": "pkg",
           "minimum_os": "15.0",
           "minisig_url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.3/WGSmart-1.0.3.pkg.sig",
-          "sha256": "756ef035f28f4d3f6285ea9e1013e066244238249da4f0cf5624d90119eac93a",
-          "signature": "sjd3lYtGW97NDbmYroiqJQEtPRghg+3kpKG3mAkDLhEMQj44shLUm3HZUred4wdj4cAesIJZ0GIm0SXtsfDrDw==",
-          "size": 21469133,
+          "sha256": "d9752e95177b022fed307b9d56d6e5514339de7035cea581bcf4fed72cf6c20c",
+          "signature": "jk/+LgyXf8BvetHJr6MeHNcZprwmnUrbeJ37nO5U++YneUtjfEADuPX+Y9sJBb14Rc4+hWPbNRo1OqG/UFIXBQ==",
+          "size": 21472423,
           "url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.3/WGSmart-1.0.3.pkg"
         }
       },
-      "pub_date": "2026-08-17T05:27:48Z",
+      "pub_date": "2026-08-17T06:03:08Z",
       "release_notes_url": "https://github.com/lyquyduong/WGSmart/releases/tag/v1.0.3",
       "rollout": {
         "groups": 7,
@@ -25,6 +25,6 @@
       "version": "1.0.3"
     }
   },
-  "generated": "2026-08-17T05:27:49Z",
+  "generated": "2026-08-17T06:03:08Z",
   "schema": 1
 }
