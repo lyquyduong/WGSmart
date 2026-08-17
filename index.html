@@ -460,7 +460,7 @@
       <div class="card flag"><h3 data-t="b3t">Route by port</h3><p data-t="b3d">Send a port or range down a chosen tunnel, TCP, UDP or both — matching on source or destination.</p></div>
       <div class="card flag"><h3 data-t="b4t">DNS routing</h3><p data-t="b4d">A local resolver that watches answers to pin routes more accurately. Present but switched off by default, because a resolver that misbehaves takes the whole machine's DNS with it.</p></div>
       <div class="card flag"><h3 data-t="b5t">Notification Center widget</h3><p data-t="b5d">Tunnel status at a glance without opening anything. Read-only — it shows state, it does not toggle tunnels.</p></div>
-      <div class="card flag"><h3 data-t="b6t">Linux and Windows</h3><p data-t="b6d">The engine cross-compiles and its tests pass for both, and a headless Linux service with a browser UI exists. Neither has been run against a real kernel yet, so neither is offered as a download.</p></div>
+      <div class="card flag"><h3 data-t="b6t">Linux and Windows</h3><p data-t="b6d">The Linux hub is downloadable and installs in one line; its packaging is verified end to end. What is unproven is the VPN itself — no tunnel has moved traffic on real hardware. Windows compiles and its tests pass, and nothing more; it is not offered as a download.</p></div>
     </div>
   </section>
 
@@ -487,6 +487,13 @@
 shasum -a 256 <span id="sha-file">WGSmart-1.0.0.pkg</span>
 <b id="sha-hex">…published with the release…</b></pre>
     <p class="tiny" style="margin-top:10px" data-t="vf-note">The in-app updater goes further: it checks the checksum and an Ed25519 signature, and the privileged service re-checks both itself before installing anything. The signing key has never been on GitHub, so a compromised account still cannot produce an update WGSmart will accept.</p>
+
+    <h3 style="margin-top:36px" data-t="lx-h">🐧 Linux server hub — one line</h3>
+    <p class="muted" style="margin-top:8px" data-t="lx-p">A different product from the Mac app: no GUI, no client. It turns a server into a WireGuard hub, under systemd, with an optional browser UI. amd64 and arm64.</p>
+    <pre style="margin-top:14px">curl -fsSL https://wgsmart.base101.app/installer.sh | sh</pre>
+    <p class="tiny" style="margin-top:10px" data-t="lx-how">On Debian and Ubuntu it configures the signed APT repository and lets <b>apt</b> install and keep verifying it. Everywhere else it downloads the signed tarball named by the signed update manifest and checks its <b>Ed25519</b> signature before extracting anything. If it cannot verify a download, it stops.</p>
+    <p class="tiny" style="margin-top:10px" data-t="lx-read">It installs a service that runs as root, so reading it first is the better habit: <code>curl -fsSL https://wgsmart.base101.app/installer.sh -o installer.sh</code>, read it, then <code>sh installer.sh</code>. Add <code>sh -s -- --with-web</code> for the browser UI, or <code>--dry-run</code> to see what it would do and change nothing.</p>
+    <p class="tiny" style="margin-top:10px" data-t="lx-warn"><b>The packaging is verified; the VPN is not.</b> Installing, upgrading and the browser UI were tested end to end on a real systemd system. No tunnel has carried traffic on real hardware — every <code>nft</code>, <code>ip</code> and cgroup call is covered only by unit tests. Use a server you can afford to break.</p>
   </section>
 
   <!-- ============ ROADMAP ============ -->
@@ -497,7 +504,7 @@ shasum -a 256 <span id="sha-file">WGSmart-1.0.0.pkg</span>
         <thead><tr><th data-t="rm-c1">Item</th><th data-t="rm-c2">Status</th><th data-t="rm-c3">Detail</th></tr></thead>
         <tbody>
           <tr><td data-t="rm1">Apple notarization</td><td><span class="chip plan" data-t="rm-next">next</span></td><td data-t="rm1d">Removes the first-launch warning entirely. Waiting on the membership fee — see below.</td></tr>
-          <tr><td data-t="rm2">Linux server edition</td><td><span class="chip test" data-t="rm-testing">in testing</span></td><td data-t="rm2d">Headless service plus a browser UI, for running the hub on a VPS. Code is complete; it has not been run on a real Linux host.</td></tr>
+          <tr><td data-t="rm2">Linux server edition</td><td><span class="chip test" data-t="rm-testing">in testing</span></td><td data-t="rm2d">Headless service plus a browser UI, for running the hub on a VPS. Installs in one line and the packaging is verified; the routing itself has not been proven on real hardware.</td></tr>
           <tr><td data-t="rm3">Windows</td><td><span class="chip plan" data-t="rm-later">later</span></td><td data-t="rm3d">The engine compiles for it. Routing by user and by port have no equivalent mechanism there yet, and the app fails those calls honestly rather than pretending.</td></tr>
           <tr><td data-t="rm4">iOS</td><td><span class="chip no" data-t="rm-no">not planned</span></td><td data-t="rm4d">Apple's networking framework allows one active tunnel at a time, which removes the entire reason WGSmart exists.</td></tr>
           <tr><td data-t="rm5">Mac App Store</td><td><span class="chip no" data-t="rm-no2">not possible</span></td><td data-t="rm5d">The privileged service and firewall access the app depends on are not allowed inside the App Store sandbox.</td></tr>
@@ -612,7 +619,7 @@ const I18N = {
     "b3t":"Route theo cổng","b3d":"Đẩy một cổng hoặc một dải cổng qua tunnel chọn trước, TCP, UDP hoặc cả hai — khớp theo cổng nguồn hoặc cổng đích.",
     "b4t":"Route theo DNS","b4d":"Một resolver cục bộ quan sát câu trả lời để ghim route chính xác hơn. Có sẵn nhưng mặc định tắt, vì một resolver chạy sai sẽ kéo theo DNS của cả máy.",
     "b5t":"Widget Notification Center","b5d":"Trạng thái tunnel nhìn là biết, không cần mở gì. Chỉ đọc — nó hiện trạng thái, không bật tắt tunnel.",
-    "b6t":"Linux và Windows","b6d":"Engine cross-compile được và test đạt cho cả hai, và đã có service Linux headless kèm UI trên browser. Cả hai chưa chạy với kernel thật, nên chưa cái nào được đưa ra tải.",
+    "b6t":"Linux và Windows","b6d":"Hub Linux đã tải về được và cài bằng một dòng lệnh; phần đóng gói đã kiểm chứng đầu-cuối. Thứ chưa được chứng minh là bản thân phần VPN — chưa tunnel nào tải lưu lượng trên phần cứng thật. Windows chỉ compile được và test đạt, không hơn; chưa đưa ra tải.",
     "dl-h":"⬇️ Tải về","dl-sub":"Một bộ cài. Nó đặt app vào Applications và cài service quyền cao mà tunnel cần — WireGuard trên macOS không route được nếu thiếu.",
     "dl-btn":"WGSmart-1.0.0.pkg","dl-notes":"Ghi chú phát hành","dl-req":"Cần macOS 15 trở lên · Apple Silicon và Intel · khoảng 19 MB",
     "gk-h":"macOS sẽ cảnh báo ở lần đầu. Đây là lý do chính xác.",
@@ -621,9 +628,14 @@ const I18N = {
     "gk-p3":"Nếu bạn thấy đánh đổi đó không đáng cho một công cụ chạy với quyền hệ thống, thì đó là quyết định hoàn toàn hợp lý — hãy chờ bản đã notarize. Đó cũng là mục được ưu tiên gây quỹ.",
     "vf-h":"Kiểm tra file bạn vừa tải","vf-p":"Checksum được công bố ở đây, trên một host khác với chỗ chứa file. Nếu có ai sửa file tải về, hai giá trị sẽ không khớp.",
     "vf-note":"Bộ cập nhật trong app còn đi xa hơn: nó kiểm checksum và chữ ký Ed25519, rồi service quyền cao tự kiểm lại cả hai trước khi cài. Khoá ký chưa bao giờ nằm trên GitHub, nên tài khoản bị chiếm vẫn không tạo được bản cập nhật mà WGSmart chấp nhận.",
+    "lx-h":"🐧 Hub máy chủ Linux — một dòng lệnh",
+    "lx-p":"Đây là sản phẩm khác với app Mac: không GUI, không client. Nó biến một máy chủ thành hub WireGuard, chạy dưới systemd, kèm giao diện web tuỳ chọn. amd64 và arm64.",
+    "lx-how":"Trên Debian và Ubuntu, nó cấu hình kho APT đã ký rồi để <b>apt</b> cài và tiếp tục xác minh về sau. Trên các hệ khác, nó tải tarball đã ký theo đúng tên ghi trong manifest đã ký, và kiểm chữ ký <b>Ed25519</b> trước khi giải nén bất cứ thứ gì. Không xác minh được thì nó dừng.",
+    "lx-read":"Nó cài một service chạy quyền root, nên đọc trước vẫn là thói quen tốt hơn: <code>curl -fsSL https://wgsmart.base101.app/installer.sh -o installer.sh</code>, đọc, rồi <code>sh installer.sh</code>. Thêm <code>sh -s -- --with-web</code> để có giao diện web, hoặc <code>--dry-run</code> để xem nó sẽ làm gì mà không thay đổi gì.",
+    "lx-warn":"<b>Phần đóng gói đã được kiểm chứng; phần VPN thì chưa.</b> Việc cài, nâng cấp và giao diện web đã được thử đầu-cuối trên một hệ systemd thật. Chưa có tunnel nào tải lưu lượng trên phần cứng thật — mọi lệnh <code>nft</code>, <code>ip</code> và cgroup mới chỉ được unit test chạm tới. Hãy dùng một máy chủ mà bạn chấp nhận làm hỏng.",
     "rm-h":"🗺️ Sắp tới là gì, và cái gì sẽ không làm","rm-c1":"Mục","rm-c2":"Trạng thái","rm-c3":"Chi tiết",
     "rm1":"Apple notarization","rm-next":"kế tiếp","rm1d":"Bỏ hẳn cảnh báo lần đầu. Đang chờ phí thành viên — xem bên dưới.",
-    "rm2":"Bản server Linux","rm-testing":"đang kiểm chứng","rm2d":"Service headless kèm UI trên browser, để chạy hub trên VPS. Code xong; chưa chạy trên host Linux thật.",
+    "rm2":"Bản server Linux","rm-testing":"đang kiểm chứng","rm2d":"Service headless kèm UI trên browser, để chạy hub trên VPS. Cài một dòng lệnh và phần đóng gói đã kiểm chứng; phần định tuyến chưa được chứng minh trên phần cứng thật.",
     "rm3":"Windows","rm-later":"sau","rm3d":"Engine compile được. Route theo user và theo cổng chưa có cơ chế tương đương ở đó, và app báo lỗi trung thực chứ không giả vờ làm được.",
     "rm4":"iOS","rm-no":"không làm","rm4d":"Framework mạng của Apple chỉ cho một tunnel hoạt động tại một thời điểm, tức là mất luôn lý do tồn tại của WGSmart.",
     "rm5":"Mac App Store","rm-no2":"không thể","rm5d":"Service quyền cao và quyền truy cập firewall mà app cần đều không được phép trong sandbox App Store.",
@@ -678,7 +690,7 @@ const I18N = {
     "b3t":"按端口分流","b3d":"把某个端口或端口段送进指定隧道，TCP、UDP 或两者皆可——按源端口或目标端口匹配。",
     "b4t":"按 DNS 分流","b4d":"一个本地解析器，通过观察应答来更准确地钉住路由。已经内置但默认关闭，因为解析器一旦出错，整台机器的 DNS 都会跟着出问题。",
     "b5t":"通知中心小组件","b5d":"不打开任何东西就能看到隧道状态。只读——它显示状态，不切换隧道。",
-    "b6t":"Linux 与 Windows","b6d":"引擎能为两者交叉编译且测试通过，也已经有无界面的 Linux 服务和浏览器 UI。两者都还没在真实内核上跑过，所以都还不提供下载。",
+    "b6t":"Linux 与 Windows","b6d":"Linux 集线器已可下载，一行命令即可安装，打包部分已端到端验证。尚未被证明的是 VPN 本身 —— 还没有隧道在真实硬件上传输过流量。Windows 仅能编译且测试通过，仅此而已，暂不提供下载。",
     "dl-h":"⬇️ 下载","dl-sub":"一个安装包。它把应用放进「应用程序」，并安装隧道所需的特权服务——macOS 上的 WireGuard 没有它就无法分流。",
     "dl-btn":"WGSmart-1.0.0.pkg","dl-notes":"版本说明","dl-req":"需要 macOS 15 或更高 · Apple Silicon 与 Intel · 约 19 MB",
     "gk-h":"首次打开时 macOS 会警告。原因如下。",
@@ -687,9 +699,14 @@ const I18N = {
     "gk-p3":"如果你觉得为一个以系统权限运行的工具做这种取舍并不值得，那是完全合理的判断——请等公证版本。它正是当前优先筹措的目标。",
     "vf-h":"核验你下载的文件","vf-p":"校验值发布在本页，与文件本身不在同一台主机上。如果有人改动过下载文件，两者就不会一致。",
     "vf-note":"应用内的更新流程走得更远：它核验校验值与 Ed25519 签名，特权服务在安装前还会自己再核验一遍。签名密钥从未放在 GitHub 上，因此即便账号被攻破，也无法造出 WGSmart 会接受的更新。",
+    "lx-h":"🐧 Linux 服务端集线器 —— 一行命令",
+    "lx-p":"这与 Mac 应用是两个产品：没有图形界面，也不是客户端。它把一台服务器变成 WireGuard 集线器，运行在 systemd 之下，并可选启用浏览器界面。支持 amd64 与 arm64。",
+    "lx-how":"在 Debian 与 Ubuntu 上，它配置已签名的 APT 仓库，交由 <b>apt</b> 安装并在此后持续校验。在其他系统上，它按已签名的更新清单所指下载已签名的 tarball，并在解压任何文件之前校验其 <b>Ed25519</b> 签名。若无法校验，它就停止。",
+    "lx-read":"它安装的是以 root 运行的服务，因此先读一遍仍是更好的习惯：<code>curl -fsSL https://wgsmart.base101.app/installer.sh -o installer.sh</code>，读完再 <code>sh installer.sh</code>。加 <code>sh -s -- --with-web</code> 可启用浏览器界面，加 <code>--dry-run</code> 则只显示它会做什么而不改动任何东西。",
+    "lx-warn":"<b>打包部分已验证；VPN 部分尚未。</b>安装、升级与浏览器界面已在真实的 systemd 系统上端到端测试过。但还没有任何隧道在真实硬件上承载过流量 —— 每一处 <code>nft</code>、<code>ip</code> 和 cgroup 调用都只被单元测试覆盖过。请用一台你输得起的服务器。",
     "rm-h":"🗺️ 接下来做什么，以及不会做什么","rm-c1":"项目","rm-c2":"状态","rm-c3":"说明",
     "rm1":"Apple 公证","rm-next":"下一步","rm1d":"彻底消除首次打开的警告。正在等会员费——见下文。",
-    "rm2":"Linux 服务端版本","rm-testing":"验证中","rm2d":"无界面服务加浏览器 UI，用于在 VPS 上运行中枢。代码已完成；尚未在真实 Linux 主机上运行。",
+    "rm2":"Linux 服务端版本","rm-testing":"验证中","rm2d":"无界面服务加浏览器 UI，用于在 VPS 上运行中枢。一行命令即可安装，打包部分已验证；路由本身尚未在真实硬件上得到证明。",
     "rm3":"Windows","rm-later":"以后","rm3d":"引擎可以为它编译。按用户和按端口分流在那里还没有对应机制，应用会如实报错，而不是假装支持。",
     "rm4":"iOS","rm-no":"不做","rm4d":"Apple 的网络框架一次只允许一条隧道活动，这等于抹掉了 WGSmart 存在的全部理由。",
     "rm5":"Mac App Store","rm-no2":"不可能","rm5d":"应用依赖的特权服务与防火墙访问，在 App Store 沙盒里都是不被允许的。",
