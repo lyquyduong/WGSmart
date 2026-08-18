@@ -1,48 +1,30 @@
 {
   "channels": {
     "stable": {
-      "build": 1000004,
+      "build": 1000005,
       "critical": false,
-      "notes": "## Your logs no longer pile up forever\n\nWGSmart keeps a log of what the daemon does, and until now it was bounded only by size \u2014 8 MB,\nthen the oldest half was dropped. That sounds tidy and is not: a quiet machine keeps **months**\ninside 8 MB, while one flapping tunnel fills the same 8 MB in **minutes**. Same setting, retention\nanywhere from an hour to a year depending on your network.\n\nThat matters more here than in most apps, because the log records which tunnels were up, when, and\nwhich names got resolved. On a VPN client that is a record of where you have been.\n\n**Settings \u25b8 Daemon now has \"Keep logs for\": 24 hours \u00b7 7 days \u00b7 30 days \u00b7 Until full.** The\ndaemon enforces it on a timer \u2014 it holds while the app is closed, and it survives a restart. The\nsize cap still runs alongside it; whichever limit is reached first is the one that cuts.\n\nThere is also a **Clear now** button, for when you want the log gone this second rather than on a\nschedule.\n\n> **Heads up: the default is 30 days, and it applies on first run.** If your daemon has been\n> logging since 1.0.0, entries older than 30 days will be dropped shortly after you update.\n> Choose **Until full** first if you want to keep them.\n\n---\n\n## Fixed\n\n**The diagnostics panel was telling you the wrong places to look.** Settings showed a socket at\n`/tmp/wgsmart.sock` \u2014 which does not exist; the real one is under `/var/run` \u2014 and a \"Config Dir\"\nof `wg_ondemand_4mac/wg_conf/`, a leftover from the shell-script project WGSmart replaced, that no\ncode has read in a very long time. Both were hard-coded strings that had quietly drifted from\nreality. They are now reported by the daemon itself, so they cannot drift again, and a path the\ndaemon has not reported shows as unknown instead of as a confident guess.\n\n**The \"Domains\" tab wrapped onto two lines** in Traffic Rules, breaking the row. The four tabs\nsplit the width evenly, which left \"IP\" holding 35pt it did not need while \"Domains\" came up 1.3pt\nshort. The labels are slightly smaller now and fit with room to spare.\n\n**Long names are readable again.** Tunnel names, endpoints, domains, app rules, port rules and\nCIDRs get cut off when they do not fit \u2014 unavoidable, since the length is yours, not ours \u2014 but\nhovering now shows the full value.\n\n## Fixed on Linux\n\n**The generated web-UI password was occasionally 24\u201327 characters instead of 28.** Never a weak\none, but the documentation said 28 and was wrong about 0.3% of the time. It is now exactly 28.\n\n**Extracting the hub tarball printed 14 warnings** about `LIBARCHIVE.xattr.com.apple.provenance` \u2014\nharmless macOS metadata, but a wall of warnings is a poor first impression of a download. Gone.\n\n**The web UI warned that `/etc/wgsmart/webui.hash` was mode 0640 and should be 0600** \u2014 while 0640\nis exactly what the installer creates, and is the *stricter* arrangement: the service can read the\nfile but not rewrite it. A warning that fires on the recommended configuration teaches people to\nignore warnings, so it now checks who the group actually is.\n\n---\n\n## Still true\n\n- **Not notarized.** macOS warns on first launch, and the warning is accurate: this build is\n  ad-hoc signed, not Developer ID signed. Right-click \u25b8 Open, or clear the quarantine attribute.\n- **App routing on macOS is per-UID**, not per-process \u2014 it routes everything a given user runs.\n  That is the honest description of what the mechanism does.\n- **The Linux hub's packaging is verified; its VPN is not.** Installing, upgrading and the browser\n  UI were tested end to end on a real systemd system. No tunnel has carried traffic on real\n  hardware \u2014 every `nft`, `ip` and cgroup call is covered only by unit tests.\n- Windows is not supported.\n\n## Verifying this download\n\n```sh\nshasum -a 256 -c WGSmart-1.0.4.pkg.sha256\n```\n\nThe `.sig` files are Ed25519 signatures over the same artifacts. The app checks them\nautomatically on every update, and since 1.0.3 it checks the update manifest's signature too.",
+      "notes": "## WGSmart v1.0.5\n\n**Smart Rules was quietly disarming your kill switch and shipping other people's Wi-Fi names as trusted defaults \u2014 both are fixed, and automation is rebuilt on a model that can no longer produce either mistake.**\n\n### \ud83d\udc1e Fixed\n- **\"Disconnect when Wi-Fi Off\" was silently removing the kill-switch firewall.** It tore every active tunnel down on any brief network drop (sleep/wake, AP roam), and the daemon removes the pf firewall once no tunnel is active \u2014 so a two-second blip could leave the machine online with neither a tunnel nor a firewall, while Settings still showed the kill switch on. This rule is now deleted; a dropped link never disconnects anything on its own.\n- **The default trusted-network list shipped as the developer's own Wi-Fi names.** Every fresh install trusted four specific networks nobody had chosen, published in a public binary \u2014 and since a trusted network makes the VPN stand down, those names could disarm any install that had never touched the setting. Existing installs are cleared automatically **only if the list still matches exactly those four defaults**; anything you edited yourself is left alone.\n- **\"Launch at Login\" did nothing.** The toggle existed but was never wired to the system \u2014 so after a reboot, Smart Rules automation was not running at all, silently, while the app still reported it active. It now registers a real macOS login item.\n- **\"Engine Active\" could say Active while nothing was happening**, or the reverse. Status now reflects whether any rule can actually act, not one flag out of several.\n\n### \u2728 New\n- **Per-tunnel activation rules**, replacing three global switches with one setting per tunnel. Each tunnel can connect on Wi-Fi and/or Ethernet, on *any* network, *only* specific ones, or *every network except* the ones you trust \u2014 and choose whether it disconnects elsewhere or is simply left alone.\n- **Wired networks are covered.** Automation previously only recognized Wi-Fi, so a wired office or hotel connection got no protection at all.\n- **Two tunnels can now activate on the same network at once** \u2014 a shape a single \"default tunnel\" could never express.\n- Your existing settings carry over automatically: whatever a tunnel did before, it does the same thing under the new model \u2014 no reconfiguration needed.\n\n### \ud83d\udee0\ufe0f Improved\n- The Smart Rules screen now shows, per tunnel, exactly why it will or won't activate on the network you're on, instead of a set of switches you had to interpret yourself.\n- Manually starting or stopping a tunnel is now respected until the network changes \u2014 automation no longer immediately undoes something you just did by hand.\n\n---\n\n### Install\n1. Download **`WGSmart-1.0.5.pkg`** below.\n2. Double-click to install WGSmart.app + the background daemon.\n3. First launch: right-click \u25b8 **Open** (until notarized).\n\n**Requirements:** macOS on Apple Silicon \u00b7 administrator access.",
       "platforms": {
         "darwin-universal": {
-          "filename": "WGSmart-1.0.4.pkg",
+          "filename": "WGSmart-1.0.5.pkg",
           "install": "pkg",
           "minimum_os": "15.0",
-          "minisig_url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.4/WGSmart-1.0.4.pkg.sig",
-          "sha256": "9c84633b6f060463e4ed9d1f0252c8afd6130124f5a17925790f17d440836087",
-          "signature": "oWeZTKdJMavSPS2fw5tl/ATwJZhIfY9cep4BVYTzO9abSq4tVdajNkaN0DKW1cIufzl+ca7leJN/Zl9mQtKODw==",
-          "size": 21550368,
-          "url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.4/WGSmart-1.0.4.pkg"
-        },
-        "linux-amd64": {
-          "filename": "wgsmart-hub-1.0.4-linux-amd64.tar.gz",
-          "install": "tarball",
-          "minisig_url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.4/wgsmart-hub-1.0.4-linux-amd64.tar.gz.sig",
-          "sha256": "baf4954c253f3655aa01a9f8cbf7fa24e25a0d5cacdc5fc695b000de4a950667",
-          "signature": "zDmVkYG5Qk4fJdvvAIdabMjUMYqH8BMNLHQhNuN9eVUKf5+tZiE/rLUSBy7nfkfjEpaGBdufnf0QOVpMkiQJAw==",
-          "size": 10011591,
-          "url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.4/wgsmart-hub-1.0.4-linux-amd64.tar.gz"
-        },
-        "linux-arm64": {
-          "filename": "wgsmart-hub-1.0.4-linux-arm64.tar.gz",
-          "install": "tarball",
-          "minisig_url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.4/wgsmart-hub-1.0.4-linux-arm64.tar.gz.sig",
-          "sha256": "e11933a736d742aabe25273e628eba716df4e618ce015d82ec1ae45258f2552b",
-          "signature": "ibMTsqoEa7e/q95AOgF/lBCjFWqvms38loXEWUuUshx6Pvfgj2uhokHaOl3XjIH8uLY5h+Rlqf2F9QaSQoP+BQ==",
-          "size": 9028469,
-          "url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.4/wgsmart-hub-1.0.4-linux-arm64.tar.gz"
+          "minisig_url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.5/WGSmart-1.0.5.pkg.sig",
+          "sha256": "5d2a0c57239b3a9bd53b41051e2a7714ba1480a57b2e1155364d36a539a18db0",
+          "signature": "PPCSzW1Q5AmHndKft9IhEoeQUEEOwvRRj2ryCPRzMV0zTHu9kqQEzRKK1R3CP5xZZmKYZzqii+XZGmvL1XbfDA==",
+          "size": 21658190,
+          "url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.5/WGSmart-1.0.5.pkg"
         }
       },
-      "pub_date": "2026-08-18T02:54:32Z",
-      "release_notes_url": "https://github.com/lyquyduong/WGSmart/releases/tag/v1.0.4",
+      "pub_date": "2026-08-18T09:38:09Z",
+      "release_notes_url": "https://github.com/lyquyduong/WGSmart/releases/tag/v1.0.5",
       "rollout": {
         "groups": 7,
         "interval_seconds": 86400
       },
-      "version": "1.0.4"
+      "version": "1.0.5"
     }
   },
-  "generated": "2026-08-18T03:18:48Z",
+  "generated": "2026-08-18T09:39:03Z",
   "schema": 1
 }
