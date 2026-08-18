@@ -8,27 +8,27 @@ Codename: stable
 Architectures: amd64 arm64
 Components: main
 Description: WGSmart apt repository
-Date: Mon, 17 Aug 2026 06:03:17 +0000
+Date: Tue, 18 Aug 2026 02:54:43 +0000
 MD5Sum:
- d2cfc178ceaa1f92172037550f9fa0f0              842 main/binary-amd64/Packages
- cdbfdff042a3c9265b2bbdf9eb8e816d              572 main/binary-amd64/Packages.gz
- 3b2da07df36a1e0d73474cf397716aa0              841 main/binary-arm64/Packages
- 30c664b9db440ff079e2c93aa46b87bc              573 main/binary-arm64/Packages.gz
+ 64d6aa83bf9d40b6951dc14a4d960bd3              842 main/binary-amd64/Packages
+ 6b0aab52aa734c1affa9fda0d96d93b1              572 main/binary-amd64/Packages.gz
+ e89e35dbc3955dfcd10a59183344c7ba              841 main/binary-arm64/Packages
+ 820437ef5685dade0f2b945437a54dc6              569 main/binary-arm64/Packages.gz
 SHA1:
- 1fbea691d48c5114e5eaf2bc8fe88c76fb4f7e64              842 main/binary-amd64/Packages
- 3e02e567ea8e901c65783b245a56cd6ab3b1a2d3              572 main/binary-amd64/Packages.gz
- 09be977de3ac05542f9cfcfffcb1608db6b4cb6d              841 main/binary-arm64/Packages
- 68022b694ab068655d458e7e970dca3ce3da1169              573 main/binary-arm64/Packages.gz
+ 884d869a322391196a93c89e15b00e9cbcc6461e              842 main/binary-amd64/Packages
+ 802dc37850fd42eb5809c26bd4a006f19d628f44              572 main/binary-amd64/Packages.gz
+ 41b7d24188718cab071066e7df2ec3c3ca663688              841 main/binary-arm64/Packages
+ 60a4241525139070390f12a6408b1d3c7209a779              569 main/binary-arm64/Packages.gz
 SHA256:
- 89d04eb451e8cfa279e28fc9f98d06b548326d2e4c88d26449b1a7b18aa46f19              842 main/binary-amd64/Packages
- 701b1fed356fdaf039c9f4561399073c3af8d6e5b45769102e5c90dae1a3f88c              572 main/binary-amd64/Packages.gz
- 50d0e3dec81ad9fe2ad5bf938f4d59ee32a1031991dddfeb7111566474d00b01              841 main/binary-arm64/Packages
- 0a1e1ec496b2d5a5180672c42108fb831f85012645aeaeef94f27bae7db0355a              573 main/binary-arm64/Packages.gz
+ 3fabcd9eefb53b8ba4c95c076c0bbc5199a5e6f181a92ac58af8c3b732945dc7              842 main/binary-amd64/Packages
+ 2c469fb51cebd97cfe023e5f61f3b1ffca23ed19da462bf4060287857eded3ef              572 main/binary-amd64/Packages.gz
+ 3d7bac115ab0ab3b64661b1868a1eac5aa7169ec73779ce876b201b602b575c2              841 main/binary-arm64/Packages
+ cdf2df2f026829b2ec033fbe3d441d0e12122eb4e5907975b0dc598bac5f7b8e              569 main/binary-arm64/Packages.gz
 -----BEGIN PGP SIGNATURE-----
 
-iKsEARYKAFMWIQQlSokfAmlWpZm48e+FQhXCxlEYbwUCaoKkJRsUgAAAAAAEAA5t
+iKsEARYKAFMWIQQlSokfAmlWpZm48e+FQhXCxlEYbwUCaoPJcxsUgAAAAAAEAA5t
 YW51MiwyLjUrMS4xMiwwLDMZHHdnc21hcnRAc29sdXRpb25zMTAxLm9yZwAKCRCF
-QhXCxlEYb7CfAPoC1V5780jPnmQkKzYcIEwU1nu6IGj6R859a4tR/htOkwD+Ijzf
-lNnJG5cam6SfeeAeX0F3IE+BmPkNdwLtZ3zD0Ao=
-=XvCW
+QhXCxlEYb+MuAQCOh2vu4odX/KKxbN3bmGqtiZ42bhJ4qbrfTKuwypUH9QD+KgFn
+7pYhaOnLMf9wHu7eUoyV5YZvyLeZ3kiy3r38ggY=
+=Kdxa
 -----END PGP SIGNATURE-----

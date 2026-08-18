@@ -1,10 +1,10 @@
 Package: wgsmart-hub
-Version: 1.0.3
+Version: 1.0.4
 Section: net
 Priority: optional
 Architecture: arm64
 Maintainer: lyquyduong <6091229+lyquyduong@users.noreply.github.com>
-Installed-Size: 23789
+Installed-Size: 23790
 Depends: iproute2, nftables
 Homepage: https://github.com/lyquyduong/WGSmart
 Description: WGSmart headless WireGuard hub for Linux servers.
@@ -12,9 +12,9 @@ Description: WGSmart headless WireGuard hub for Linux servers.
  forwarding, installs an nftables masquerade for the tunnel subnet and opens
  the listen port. Runs the same core as the macOS daemon, under systemd.
  Managed locally over a root-owned Unix socket, or remotely over TLS 1.3.
-Filename: pool/main/wgsmart-hub_1.0.3_arm64.deb
-Size: 9235488
-MD5sum: 0d11e3ffaef9076ac40fe31e549646b8
-SHA1: 8ce05a50559e4b3c24c70d2ff8e2444e8ef9f780
-SHA256: e43590d6694f26a50b05d8010615f1ed6bab8bf012548dc8a97bc9028438cd1e
+Filename: pool/main/wgsmart-hub_1.0.4_arm64.deb
+Size: 9257848
+MD5sum: d8652a5833f669995c27ff6e0efd947b
+SHA1: 14c37a670fde98659ffad9891e44e5f4a13519ce
+SHA256: 7edf4f34df8edd669b11655ad9fce2a120e5af513627a1a10e790eb8465a6e61
 
