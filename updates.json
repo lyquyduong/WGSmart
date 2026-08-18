@@ -1,30 +1,30 @@
 {
   "channels": {
     "stable": {
-      "build": 1000005,
+      "build": 1000006,
       "critical": false,
-      "notes": "## WGSmart v1.0.5\n\n**Smart Rules was quietly disarming your kill switch and shipping other people's Wi-Fi names as trusted defaults \u2014 both are fixed, and automation is rebuilt on a model that can no longer produce either mistake.**\n\n### \ud83d\udc1e Fixed\n- **\"Disconnect when Wi-Fi Off\" was silently removing the kill-switch firewall.** It tore every active tunnel down on any brief network drop (sleep/wake, AP roam), and the daemon removes the pf firewall once no tunnel is active \u2014 so a two-second blip could leave the machine online with neither a tunnel nor a firewall, while Settings still showed the kill switch on. This rule is now deleted; a dropped link never disconnects anything on its own.\n- **The default trusted-network list shipped as the developer's own Wi-Fi names.** Every fresh install trusted four specific networks nobody had chosen, published in a public binary \u2014 and since a trusted network makes the VPN stand down, those names could disarm any install that had never touched the setting. Existing installs are cleared automatically **only if the list still matches exactly those four defaults**; anything you edited yourself is left alone.\n- **\"Launch at Login\" did nothing.** The toggle existed but was never wired to the system \u2014 so after a reboot, Smart Rules automation was not running at all, silently, while the app still reported it active. It now registers a real macOS login item.\n- **\"Engine Active\" could say Active while nothing was happening**, or the reverse. Status now reflects whether any rule can actually act, not one flag out of several.\n\n### \u2728 New\n- **Per-tunnel activation rules**, replacing three global switches with one setting per tunnel. Each tunnel can connect on Wi-Fi and/or Ethernet, on *any* network, *only* specific ones, or *every network except* the ones you trust \u2014 and choose whether it disconnects elsewhere or is simply left alone.\n- **Wired networks are covered.** Automation previously only recognized Wi-Fi, so a wired office or hotel connection got no protection at all.\n- **Two tunnels can now activate on the same network at once** \u2014 a shape a single \"default tunnel\" could never express.\n- Your existing settings carry over automatically: whatever a tunnel did before, it does the same thing under the new model \u2014 no reconfiguration needed.\n\n### \ud83d\udee0\ufe0f Improved\n- The Smart Rules screen now shows, per tunnel, exactly why it will or won't activate on the network you're on, instead of a set of switches you had to interpret yourself.\n- Manually starting or stopping a tunnel is now respected until the network changes \u2014 automation no longer immediately undoes something you just did by hand.\n\n---\n\n### Install\n1. Download **`WGSmart-1.0.5.pkg`** below.\n2. Double-click to install WGSmart.app + the background daemon.\n3. First launch: right-click \u25b8 **Open** (until notarized).\n\n**Requirements:** macOS on Apple Silicon \u00b7 administrator access.",
+      "notes": "## WGSmart v1.0.6\n\n**Two fixes from v1.0.5: the \"Relaunch Now\" button after an update, and a cramped panel that could truncate or clip text.**\n\n### \ud83d\udc1e Fixed\n- **\"Relaunch Now\" after an install could silently do nothing.** The update sheet's footer packed four items into one row that needed more width than the window had \u2014 so the button was pushed partly outside the window, and clicks on the part hanging off the edge landed on nothing. The same overflow affected the error state's \"Retry\" button. Both are now laid out to fit, and every action button has a proper click target.\n- **The per-tunnel automation panel was cramped and hard to read.** Introduced in v1.0.5, it sized its controls for a wider space than the 236pt it actually has in the tunnel detail panel \u2014 \"Ethernet\" could break mid-word, the network-scope picker truncated to \"Every netw\u2026\", and each trusted network showed on its own line. Controls now use the full available width, labels sit above them instead of beside them, and the summary text describes the rule in a sentence instead of listing every network name.\n- Renamed some Smart Rules status labels to plainer language (\"Off on this network\" instead of \"Standing down here\").\n\n---\n\n### Install\n1. Download **`WGSmart-1.0.6.pkg`** below.\n2. Double-click to install WGSmart.app + the background daemon.\n3. First launch: right-click \u25b8 **Open** (until notarized).\n\n**Requirements:** macOS on Apple Silicon \u00b7 administrator access.",
       "platforms": {
         "darwin-universal": {
-          "filename": "WGSmart-1.0.5.pkg",
+          "filename": "WGSmart-1.0.6.pkg",
           "install": "pkg",
           "minimum_os": "15.0",
-          "minisig_url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.5/WGSmart-1.0.5.pkg.sig",
-          "sha256": "5d2a0c57239b3a9bd53b41051e2a7714ba1480a57b2e1155364d36a539a18db0",
-          "signature": "PPCSzW1Q5AmHndKft9IhEoeQUEEOwvRRj2ryCPRzMV0zTHu9kqQEzRKK1R3CP5xZZmKYZzqii+XZGmvL1XbfDA==",
-          "size": 21658190,
-          "url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.5/WGSmart-1.0.5.pkg"
+          "minisig_url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.6/WGSmart-1.0.6.pkg.sig",
+          "sha256": "50a3e4e26276c045abdc9308dad4a9791e56a331ea42d1ce505f6da9fd65cb52",
+          "signature": "0Y+YSzqV8rPzMY9+AfPSDFS1Hly3BJ+U1VfbrfvUZqwRT01iLbWZnBWiC3805OYb6WSGW46BedVNQXR1zhV1DA==",
+          "size": 21682949,
+          "url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.6/WGSmart-1.0.6.pkg"
         }
       },
-      "pub_date": "2026-08-18T09:38:09Z",
-      "release_notes_url": "https://github.com/lyquyduong/WGSmart/releases/tag/v1.0.5",
+      "pub_date": "2026-08-18T14:10:34Z",
+      "release_notes_url": "https://github.com/lyquyduong/WGSmart/releases/tag/v1.0.6",
       "rollout": {
         "groups": 7,
         "interval_seconds": 86400
       },
-      "version": "1.0.5"
+      "version": "1.0.6"
     }
   },
-  "generated": "2026-08-18T09:39:03Z",
+  "generated": "2026-08-18T14:11:16Z",
   "schema": 1
 }
