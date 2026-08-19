@@ -1,30 +1,30 @@
 {
   "channels": {
     "stable": {
-      "build": 1000006,
+      "build": 1000007,
       "critical": false,
-      "notes": "## WGSmart v1.0.6\n\n**Two fixes from v1.0.5: the \"Relaunch Now\" button after an update, and a cramped panel that could truncate or clip text.**\n\n### \ud83d\udc1e Fixed\n- **\"Relaunch Now\" after an install could silently do nothing.** The update sheet's footer packed four items into one row that needed more width than the window had \u2014 so the button was pushed partly outside the window, and clicks on the part hanging off the edge landed on nothing. The same overflow affected the error state's \"Retry\" button. Both are now laid out to fit, and every action button has a proper click target.\n- **The per-tunnel automation panel was cramped and hard to read.** Introduced in v1.0.5, it sized its controls for a wider space than the 236pt it actually has in the tunnel detail panel \u2014 \"Ethernet\" could break mid-word, the network-scope picker truncated to \"Every netw\u2026\", and each trusted network showed on its own line. Controls now use the full available width, labels sit above them instead of beside them, and the summary text describes the rule in a sentence instead of listing every network name.\n- Renamed some Smart Rules status labels to plainer language (\"Off on this network\" instead of \"Standing down here\").\n\n---\n\n### Install\n1. Download **`WGSmart-1.0.6.pkg`** below.\n2. Double-click to install WGSmart.app + the background daemon.\n3. First launch: right-click \u25b8 **Open** (until notarized).\n\n**Requirements:** macOS on Apple Silicon \u00b7 administrator access.",
+      "notes": "## WGSmart v1.0.7\n\n**Each tunnel can now keep its own \"except these networks\" list instead of every tunnel sharing one.**\n\n### \ud83d\udc1e Fixed\n- **\"Except these networks\" was forced onto one shared list across every tunnel.** So \"stand this VPN down at the office\" and \"stand that VPN down at home\" could not both be set up \u2014 every tunnel using this mode stood down in the same places. This broke exactly the case where two tunnels serve two different purposes.\n\n### \u2728 New\n- Each tunnel's exception list can now follow the shared trusted-network list (the default \u2014 no setup needed) **or** keep a list of its own. Switching to a private list starts from what the tunnel was already excluding, so nothing resets to empty.\n- Adding or removing a network from the shared trusted list only affects tunnels still following it. The activity log says when a change skipped a tunnel using its own list, instead of silently doing nothing.\n\n### \ud83d\udee0\ufe0f Improved\n- The Smart Rules summary now says where an exception list comes from \u2014 \"your trusted networks\" versus \"networks you chose\" \u2014 so it's clear which one a tunnel is using without opening its settings.\n\n---\n\n### Install\n1. Download **`WGSmart-1.0.7.pkg`** below.\n2. Double-click to install WGSmart.app + the background daemon.\n3. First launch: right-click \u25b8 **Open** (until notarized).\n\n**Requirements:** macOS on Apple Silicon \u00b7 administrator access.",
       "platforms": {
         "darwin-universal": {
-          "filename": "WGSmart-1.0.6.pkg",
+          "filename": "WGSmart-1.0.7.pkg",
           "install": "pkg",
           "minimum_os": "15.0",
-          "minisig_url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.6/WGSmart-1.0.6.pkg.sig",
-          "sha256": "50a3e4e26276c045abdc9308dad4a9791e56a331ea42d1ce505f6da9fd65cb52",
-          "signature": "0Y+YSzqV8rPzMY9+AfPSDFS1Hly3BJ+U1VfbrfvUZqwRT01iLbWZnBWiC3805OYb6WSGW46BedVNQXR1zhV1DA==",
-          "size": 21682949,
-          "url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.6/WGSmart-1.0.6.pkg"
+          "minisig_url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.7/WGSmart-1.0.7.pkg.sig",
+          "sha256": "d070975a0b311f6bce11a959c1f341e30ac0064265295638a8f36dea340307b6",
+          "signature": "y4Xg2Q3FPH6O5/QvabE+7oInM7Aje1sXYApboeeHFg2P4fzndwRqLqaIMxR/0ZlZ2BboJGKb/hv/GvKRFnyPBQ==",
+          "size": 21693617,
+          "url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.7/WGSmart-1.0.7.pkg"
         }
       },
-      "pub_date": "2026-08-18T14:10:34Z",
-      "release_notes_url": "https://github.com/lyquyduong/WGSmart/releases/tag/v1.0.6",
+      "pub_date": "2026-08-19T08:17:10Z",
+      "release_notes_url": "https://github.com/lyquyduong/WGSmart/releases/tag/v1.0.7",
       "rollout": {
         "groups": 7,
         "interval_seconds": 86400
       },
-      "version": "1.0.6"
+      "version": "1.0.7"
     }
   },
-  "generated": "2026-08-18T14:11:16Z",
+  "generated": "2026-08-19T08:18:01Z",
   "schema": 1
 }
