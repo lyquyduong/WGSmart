@@ -1,30 +1,30 @@
 {
   "channels": {
     "stable": {
-      "build": 1000007,
+      "build": 1000008,
       "critical": false,
-      "notes": "## WGSmart v1.0.7\n\n**Each tunnel can now keep its own \"except these networks\" list instead of every tunnel sharing one.**\n\n### \ud83d\udc1e Fixed\n- **\"Except these networks\" was forced onto one shared list across every tunnel.** So \"stand this VPN down at the office\" and \"stand that VPN down at home\" could not both be set up \u2014 every tunnel using this mode stood down in the same places. This broke exactly the case where two tunnels serve two different purposes.\n\n### \u2728 New\n- Each tunnel's exception list can now follow the shared trusted-network list (the default \u2014 no setup needed) **or** keep a list of its own. Switching to a private list starts from what the tunnel was already excluding, so nothing resets to empty.\n- Adding or removing a network from the shared trusted list only affects tunnels still following it. The activity log says when a change skipped a tunnel using its own list, instead of silently doing nothing.\n\n### \ud83d\udee0\ufe0f Improved\n- The Smart Rules summary now says where an exception list comes from \u2014 \"your trusted networks\" versus \"networks you chose\" \u2014 so it's clear which one a tunnel is using without opening its settings.\n\n---\n\n### Install\n1. Download **`WGSmart-1.0.7.pkg`** below.\n2. Double-click to install WGSmart.app + the background daemon.\n3. First launch: right-click \u25b8 **Open** (until notarized).\n\n**Requirements:** macOS on Apple Silicon \u00b7 administrator access.",
+      "notes": "## WGSmart v1.0.8\n\n**A tunnel that stayed connected when it should have stood down \u2014 most likely to happen right after updating, since that's when this bug fired.**\n\n### \ud83d\udc1e Fixed\n- **A tunnel could get permanently stuck ignoring its own automation rule.** If a disconnect (or connect) command happened to be refused \u2014 most commonly because the daemon was mid-restart, which happens on every app update \u2014 the app would silently stop trying that tunnel again for the rest of the session. Smart Rules would say \"Stays off here\" while the Dashboard kept showing it Connected. Commands are now retried (up to 3 times) when refused, and the retry budget resets whenever you change networks or edit the tunnel's rule, so a bad moment no longer disables automation for good.\n\n---\n\n### Install\n1. Download **`WGSmart-1.0.8.pkg`** below.\n2. Double-click to install WGSmart.app + the background daemon.\n3. First launch: right-click \u25b8 **Open** (until notarized).\n\n**Requirements:** macOS on Apple Silicon \u00b7 administrator access.",
       "platforms": {
         "darwin-universal": {
-          "filename": "WGSmart-1.0.7.pkg",
+          "filename": "WGSmart-1.0.8.pkg",
           "install": "pkg",
           "minimum_os": "15.0",
-          "minisig_url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.7/WGSmart-1.0.7.pkg.sig",
-          "sha256": "d070975a0b311f6bce11a959c1f341e30ac0064265295638a8f36dea340307b6",
-          "signature": "y4Xg2Q3FPH6O5/QvabE+7oInM7Aje1sXYApboeeHFg2P4fzndwRqLqaIMxR/0ZlZ2BboJGKb/hv/GvKRFnyPBQ==",
-          "size": 21693617,
-          "url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.7/WGSmart-1.0.7.pkg"
+          "minisig_url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.8/WGSmart-1.0.8.pkg.sig",
+          "sha256": "03c9f9a038228fcf7258e459026a5bdfdcad19eb9dcb279b5e94c89f78c131b5",
+          "signature": "AkQXMvbCaHZ6waZzgxolOfBFbmjYXdCv6wdYoFSMEYEoKA9SGxUJbdzhe5O9PyNwd0jzLSIkixPQfv5gTaYkBw==",
+          "size": 21697369,
+          "url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.8/WGSmart-1.0.8.pkg"
         }
       },
-      "pub_date": "2026-08-19T08:17:10Z",
-      "release_notes_url": "https://github.com/lyquyduong/WGSmart/releases/tag/v1.0.7",
+      "pub_date": "2026-08-19T13:19:08Z",
+      "release_notes_url": "https://github.com/lyquyduong/WGSmart/releases/tag/v1.0.8",
       "rollout": {
         "groups": 7,
         "interval_seconds": 86400
       },
-      "version": "1.0.7"
+      "version": "1.0.8"
     }
   },
-  "generated": "2026-08-19T08:18:01Z",
+  "generated": "2026-08-19T13:19:40Z",
   "schema": 1
 }
