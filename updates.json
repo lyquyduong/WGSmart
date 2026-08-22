@@ -1,30 +1,30 @@
 {
   "channels": {
     "stable": {
-      "build": 1000008,
+      "build": 1000009,
       "critical": false,
-      "notes": "## WGSmart v1.0.8\n\n**A tunnel that stayed connected when it should have stood down \u2014 most likely to happen right after updating, since that's when this bug fired.**\n\n### \ud83d\udc1e Fixed\n- **A tunnel could get permanently stuck ignoring its own automation rule.** If a disconnect (or connect) command happened to be refused \u2014 most commonly because the daemon was mid-restart, which happens on every app update \u2014 the app would silently stop trying that tunnel again for the rest of the session. Smart Rules would say \"Stays off here\" while the Dashboard kept showing it Connected. Commands are now retried (up to 3 times) when refused, and the retry budget resets whenever you change networks or edit the tunnel's rule, so a bad moment no longer disables automation for good.\n\n---\n\n### Install\n1. Download **`WGSmart-1.0.8.pkg`** below.\n2. Double-click to install WGSmart.app + the background daemon.\n3. First launch: right-click \u25b8 **Open** (until notarized).\n\n**Requirements:** macOS on Apple Silicon \u00b7 administrator access.",
+      "notes": "## WGSmart v1.0.9\n\n**Two Tunnels-tab fixes: switching a tunnel on/off now shows you that tunnel, and its detail panel's close button is easier to see and click.**\n\n### \ud83d\udc1e Fixed\n- **Toggling a tunnel's connection from the list didn't focus it.** Flipping a tunnel's on/off switch (or using Connect/Disconnect from the right-click menu) changed its state with no visual confirmation of which tunnel you'd just acted on \u2014 the detail panel stayed on whatever was already open, or nothing. Both actions now open that tunnel's detail panel.\n- **The detail panel's close button was too small and low-contrast to comfortably see or click.** Sized and colored to match the equivalent control already used elsewhere in the app (Smart Rules' network-removal button), so it's easier to find without becoming a heavy or alarming \"close\" affordance.\n- **The Smart Rules \"on this network\" status text rendered at inconsistent sizes across tunnels.** A tunnel with a longer name could squeeze its own status label into shrinking, while a tunnel with a shorter name showed the same kind of label at full size \u2014 the same status (\"Stays off here\", \"Manual only\", etc.) looked like different font sizes depending on which tunnel it belonged to. The label column is now a fixed width, so every row renders at the same size.\n\n---\n\n### Install\n1. Download **`WGSmart-1.0.9.pkg`** below.\n2. Double-click to install WGSmart.app + the background daemon.\n3. First launch: right-click \u25b8 **Open** (until notarized).\n\n**Requirements:** macOS on Apple Silicon \u00b7 administrator access.",
       "platforms": {
         "darwin-universal": {
-          "filename": "WGSmart-1.0.8.pkg",
+          "filename": "WGSmart-1.0.9.pkg",
           "install": "pkg",
           "minimum_os": "15.0",
-          "minisig_url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.8/WGSmart-1.0.8.pkg.sig",
-          "sha256": "03c9f9a038228fcf7258e459026a5bdfdcad19eb9dcb279b5e94c89f78c131b5",
-          "signature": "AkQXMvbCaHZ6waZzgxolOfBFbmjYXdCv6wdYoFSMEYEoKA9SGxUJbdzhe5O9PyNwd0jzLSIkixPQfv5gTaYkBw==",
-          "size": 21697369,
-          "url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.8/WGSmart-1.0.8.pkg"
+          "minisig_url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.9/WGSmart-1.0.9.pkg.sig",
+          "sha256": "451e9729f35d3d6d0e0af8d23eb6fe0765a62693cdfdec867a01f563cad0e253",
+          "signature": "qbk+3uBunjqAdC/RJIOvGJq1YO3/xUkAISTt2o/2Szpp1JzttXPO/YfgxnwTYDBXo6ucmXBTcXsf6m+g6iJ1Bw==",
+          "size": 21699384,
+          "url": "https://github.com/lyquyduong/WGSmart/releases/download/v1.0.9/WGSmart-1.0.9.pkg"
         }
       },
-      "pub_date": "2026-08-19T13:19:08Z",
-      "release_notes_url": "https://github.com/lyquyduong/WGSmart/releases/tag/v1.0.8",
+      "pub_date": "2026-08-22T14:00:08Z",
+      "release_notes_url": "https://github.com/lyquyduong/WGSmart/releases/tag/v1.0.9",
       "rollout": {
         "groups": 7,
         "interval_seconds": 86400
       },
-      "version": "1.0.8"
+      "version": "1.0.9"
     }
   },
-  "generated": "2026-08-19T13:19:40Z",
+  "generated": "2026-08-22T14:00:39Z",
   "schema": 1
 }
